@@ -66,7 +66,7 @@ export const statements = (statements => Object.fromEntries(
 		getOutput(line:ProcessedLine):MemoryValue {
 			const instruction = line.lexemes[1]!.value;
 			const id = instructionMapping.get(instruction);
-			if(id == undefined) throw new Error(`Invalid instruction ${instruction}`);
+			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
 			return {
 				address: line.lexemes[0]?.type == "number" ? + line.lexemes[0].value : undefined,
 				value: (+id << 8) + +(line.lexemes[2]?.value ?? 0)

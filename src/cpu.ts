@@ -42,13 +42,13 @@ export class RAM {
 	}
 	read(index:number){
 		if(index in this.storage) return this.storage[index];
-		else throw new Error(`Index ${index} is out of bounds`);
+		else throw new Error(`Memory address "${index}" is out of bounds`);
 	}
 	write(index:number, value:number){
 		if(!Number.isInteger(value)) throw new Error(`Value ${value} is not an integer`);
-		if(value < 0 || value > RAM.maxValue) throw new Error(`Value ${value} is not a valid 16-bit integer`);
+		if(value < 0 || value > RAM.maxValue) throw new Error(`Value "${value}" is not a valid 16-bit integer`);
 		if(index in this.storage) this.storage[index] = value;
-		else throw new Error(`Index ${index} is out of bounds`);
+		else throw new Error(`Memory address "${index}" is out of bounds`);
 	}
 }
 

@@ -18,7 +18,7 @@ export function processProgram(lexedProgram) {
     for (const line of lexedProgram.lines) {
         const def = getStatementDefinition(line);
         if (def == null)
-            throw new Error(`Invalid line ${line.map(l => l.value).join(" ")}`); //TODO include text in lexedline
+            throw new Error(`Invalid line "${line.rawText}"`);
         lines.push(def[1]);
     }
     return { lines };

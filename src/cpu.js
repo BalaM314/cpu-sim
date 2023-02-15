@@ -39,17 +39,17 @@ export class RAM {
         if (index in this.storage)
             return this.storage[index];
         else
-            throw new Error(`Index ${index} is out of bounds`);
+            throw new Error(`Memory address "${index}" is out of bounds`);
     }
     write(index, value) {
         if (!Number.isInteger(value))
             throw new Error(`Value ${value} is not an integer`);
         if (value < 0 || value > RAM.maxValue)
-            throw new Error(`Value ${value} is not a valid 16-bit integer`);
+            throw new Error(`Value "${value}" is not a valid 16-bit integer`);
         if (index in this.storage)
             this.storage[index] = value;
         else
-            throw new Error(`Index ${index} is out of bounds`);
+            throw new Error(`Memory address "${index}" is out of bounds`);
     }
 }
 _a = RAM;

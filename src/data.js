@@ -51,7 +51,7 @@ export const statements = (statements => Object.fromEntries(Object.entries(state
             const instruction = line.lexemes[1].value;
             const id = instructionMapping.get(instruction);
             if (id == undefined)
-                throw new Error(`Invalid instruction ${instruction}`);
+                throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
             return {
                 address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "number" ? +line.lexemes[0].value : undefined,
                 value: (+id << 8) + +((_c = (_b = line.lexemes[2]) === null || _b === void 0 ? void 0 : _b.value) !== null && _c !== void 0 ? _c : 0)
