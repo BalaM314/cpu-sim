@@ -1,5 +1,6 @@
 import type { ProgramExecutor } from "./cpu.js";
-import type { ProcessedLine, MemoryValue, LexemeMatcher } from "./assembler/types.js";
+import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
+import { processLexemeMatcherString } from "./assembler/lexer.js";
 
 export const lexemeTypes = ["number", "instruction", "label"] as const;
 
@@ -40,32 +41,6 @@ export const instructions: {
 	}},
 };
 export const instructionMapping = new Map(Object.entries(instructions).map(([id, data]) => [id, data.code].reverse() as [code:string, id:string]));
-
-function processLexemeMatcherString(str:string):LexemeMatcher {
-	let slicedStr:string, isOptional:boolean;
-	if(str.endsWith("?")){
-		slicedStr = str.slice(0, -1);
-		isOptional = true;
-	} else {
-		slicedStr = str;
-		isOptional = false;
-	}
-	if(slicedStr.includes("|")){
-		const types = slicedStr.split("|");
-		types.forEach(type => {
-			if(!lexemeTypes.includes(type as any)) throw new Error(`Invalid lexeme matcher string, this is an error with cpu-sim`);
-		});
-		return {
-			matcher: lexeme => types.includes(lexeme.type),
-			isOptional
-		};
-	} else {
-		return {
-			matcher: lexeme => slicedStr == lexeme.type,
-			isOptional
-		};
-	}
-}
 
 export const statements = (statements => Object.fromEntries(
 	Object.entries(statements)

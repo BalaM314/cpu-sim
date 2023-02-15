@@ -1,5 +1,7 @@
 import "jasmine";
-import { getStatementDefinition, lexLine, lexProgram, lineMatches, processLexemeMatcherString, processProgram, statements } from "../src/assembler/asm.js";
+import { statements } from "../src/data.js";
+import { processProgram, lineMatches, getStatementDefinition } from "../src/assembler/assembler.js";
+import { lexLine, lexProgram, processLexemeMatcherString } from "../src/assembler/lexer.js";
 describe("lexLine", () => {
     it("should convert a line to lexemes", () => {
         expect(lexLine("NOP")).toEqual([

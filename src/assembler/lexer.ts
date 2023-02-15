@@ -1,4 +1,5 @@
-import type { LexedLine, LexedProgram } from "./types.js";
+import { lexemeTypes } from "../data.js";
+import type { LexedLine, LexedProgram, LexemeMatcher } from "./types.js";
 
 
 export function splitLineOnSpace(line:string):string[] {
@@ -19,6 +20,32 @@ export function splitLineOnSpace(line:string):string[] {
 		return chunks;
 	} else {
 		return line.split(" ");
+	}
+}
+
+export function processLexemeMatcherString(str:string):LexemeMatcher {
+	let slicedStr:string, isOptional:boolean;
+	if(str.endsWith("?")){
+		slicedStr = str.slice(0, -1);
+		isOptional = true;
+	} else {
+		slicedStr = str;
+		isOptional = false;
+	}
+	if(slicedStr.includes("|")){
+		const types = slicedStr.split("|");
+		types.forEach(type => {
+			if(!lexemeTypes.includes(type as any)) throw new Error(`Invalid lexeme matcher string, this is an error with cpu-sim`);
+		});
+		return {
+			matcher: lexeme => types.includes(lexeme.type),
+			isOptional
+		};
+	} else {
+		return {
+			matcher: lexeme => slicedStr == lexeme.type,
+			isOptional
+		};
 	}
 }
 

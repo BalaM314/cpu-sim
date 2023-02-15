@@ -1,3 +1,4 @@
+import { processLexemeMatcherString } from "./assembler/lexer.js";
 export const lexemeTypes = ["number", "instruction", "label"];
 export const instructions = {
     [0x00]: { code: "END", exec(executor) { executor.on = false; return {}; } },
@@ -33,34 +34,6 @@ export const instructions = {
         } },
 };
 export const instructionMapping = new Map(Object.entries(instructions).map(([id, data]) => [id, data.code].reverse()));
-function processLexemeMatcherString(str) {
-    let slicedStr, isOptional;
-    if (str.endsWith("?")) {
-        slicedStr = str.slice(0, -1);
-        isOptional = true;
-    }
-    else {
-        slicedStr = str;
-        isOptional = false;
-    }
-    if (slicedStr.includes("|")) {
-        const types = slicedStr.split("|");
-        types.forEach(type => {
-            if (!lexemeTypes.includes(type))
-                throw new Error(`Invalid lexeme matcher string, this is an error with cpu-sim`);
-        });
-        return {
-            matcher: lexeme => types.includes(lexeme.type),
-            isOptional
-        };
-    }
-    else {
-        return {
-            matcher: lexeme => slicedStr == lexeme.type,
-            isOptional
-        };
-    }
-}
 export const statements = (statements => Object.fromEntries(Object.entries(statements)
     .map(([k, v]) => [k, Object.assign(Object.assign({}, v), { lexemeMatchers: v.lexemes.map(processLexemeMatcherString) })]).map(([k, v]) => [k, Object.assign(Object.assign({}, v), { maxLexemes: v.lexemeMatchers.length, minLexemes: v.lexemeMatchers.filter(m => !m.isOptional).length })])))({
     instruction: {
