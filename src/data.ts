@@ -32,8 +32,16 @@ export const instructions: {
 	[0x32]: { code: "LDI", exec(executor, operand){executor.registers.acc = executor.mem.read(executor.mem.read(operand)); return {};} },
 	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.acc); return {};} },
 	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.acc += executor.mem.read(operand); return {};} },
+	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.acc -= executor.mem.read(operand); return {};} },
+	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.acc *= executor.mem.read(operand); return {};} },
+	[0x53]: { code: "DIV", exec(executor, operand){executor.registers.acc = Math.trunc(executor.registers.acc / executor.mem.read(operand)); return {};} },
 	[0x54]: { code: "INC", exec(executor, operand){executor.registers.acc ++; return {};} },
+	[0x55]: { code: "AND", exec(executor, operand){executor.registers.acc &= executor.mem.read(operand); return {};} },
+	[0x56]: { code: "ORD", exec(executor, operand){executor.registers.acc |= executor.mem.read(operand); return {};} },
+	[0x57]: { code: "XOR", exec(executor, operand){executor.registers.acc ^= executor.mem.read(operand); return {};} },
 	[0x60]: { code: "CMP", exec(executor, operand){executor.flags.compare = executor.registers.acc == executor.mem.read(operand); return {};} },
+	[0x61]: { code: "SLT", exec(executor, operand){executor.flags.compare = executor.registers.acc < executor.mem.read(operand); return {};} },
+	[0x62]: { code: "SGT", exec(executor, operand){executor.flags.compare = executor.registers.acc > executor.mem.read(operand); return {};} },
 	[0xFF]: { code: "", exec(executor, operand, opcode){
 		executor.on = false;
 		console.warn(`Invalid instruction at 0x${executor.instructionPointer.toString(16)} (${(opcode * 0x100 + operand).toString(16)})`);
