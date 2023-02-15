@@ -150,7 +150,78 @@ export function lexLine(line) {
         throw new Error(`Invalid chunk ${chunk} in line ${line}`);
     });
 }
+/**Removes trailing/leading whitespaces and tabs from a line. */
+export function removeTrailingSpaces(line) {
+    return line
+        .replace(/(^[ \t]+)|([ \t]+$)/g, "");
+}
+/**Removes single line and multiline comments from a line. */
+export function removeComments(line) {
+    const charsplitInput = line.split("");
+    const parsedChars = [];
+    let lastChar = "";
+    const state = {
+        inSComment: false,
+        inMComment: false,
+        inDString: false
+    };
+    for (const _char in charsplitInput) {
+        const char = charsplitInput[_char];
+        if (typeof char !== "string")
+            continue;
+        if (state.inSComment) {
+            if (char === "\n") {
+                state.inSComment = false;
+            }
+            lastChar = char;
+            continue;
+        }
+        else if (state.inMComment) {
+            if (lastChar === "*" && char === "/") {
+                state.inMComment = false;
+            }
+            lastChar = char;
+            continue;
+        }
+        else if (state.inDString) {
+            if (lastChar !== `\\` && char === `"`) {
+                state.inDString = false;
+            }
+        }
+        else if (char === "#") {
+            state.inSComment = true;
+            lastChar = char;
+            continue;
+            //skip characters until next newline
+        }
+        else if (lastChar === "/" && char === "*") {
+            state.inMComment = true;
+            parsedChars.pop();
+            lastChar = char;
+            continue;
+            //skip characters until "*/"
+        }
+        else if (lastChar !== `\\` && char === `"`) {
+            if (char === "\"" && lastChar !== `\\`) {
+                state.inDString = true;
+            }
+        }
+        else if (lastChar === "/" && char === "/") {
+            state.inSComment = true;
+            parsedChars.pop();
+            lastChar = char;
+            continue;
+        }
+        lastChar = char;
+        parsedChars.push(char);
+    }
+    return parsedChars.join("");
+}
+/**Cleans a line by removing trailing/leading whitespaces/tabs, and comments. */
+export function cleanLine(line) {
+    return removeTrailingSpaces(removeComments(line));
+}
 export function lexProgram(program) {
-    const lines = program.map(line => lexLine(line));
+    const lines = program.map(cleanLine).filter(line => line).map(line => lexLine(line));
     return { lines };
 }
