@@ -24,11 +24,11 @@ export function processProgram(lexedProgram) {
     return { lines };
 }
 export function lineMatches(line, statement) {
-    if (line.length > statement.maxLexemes)
+    if (line.lexemes.length > statement.maxLexemes)
         return false; //Too many lexemes
-    if (line.length < statement.minLexemes)
+    if (line.lexemes.length < statement.minLexemes)
         return false; //Not enough lexemes
-    const lineCopy = line.slice();
+    const lineCopy = line.lexemes.slice();
     const assignedLine = [];
     for (const [i, matcher] of statement.lexemeMatchers.entries()) {
         const lexeme = lineCopy[0];
@@ -51,7 +51,7 @@ export function lineMatches(line, statement) {
     if (lineCopy.length > 0)
         return false; //Too many lexemes
     return {
-        statementDefinition: statement, lexemes: assignedLine
+        statementDefinition: statement, lexemes: assignedLine, rawText: line.rawText
     };
 }
 export function getStatementDefinitions(line) {

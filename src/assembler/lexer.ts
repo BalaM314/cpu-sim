@@ -50,12 +50,15 @@ export function processLexemeMatcherString(str:string):LexemeMatcher {
 }
 
 export function lexLine(line:string):LexedLine {
-	return splitLineOnSpace(line).map(chunk => {
-		if(chunk.match(/^[a-z]{3}$/i)) return { type: "instruction", value: chunk };
-		if(chunk.match(/^\d+$/i)) return { type: "number", value: chunk };
-		if(chunk.match(/^\w+\:$/i)) return { type: "label", value: chunk };
-		throw new Error(`Invalid chunk ${chunk} in line ${line}`);
-	})
+	return {
+		lexemes: splitLineOnSpace(line).map(chunk => {
+			if(chunk.match(/^[a-z]{3}$/i)) return { type: "instruction", value: chunk };
+			if(chunk.match(/^\d+$/i)) return { type: "number", value: chunk };
+			if(chunk.match(/^\w+\:$/i)) return { type: "label", value: chunk };
+			throw new Error(`Invalid chunk ${chunk} in line ${line}`);
+		}),
+		rawText: line
+	};
 }
 
 /**Removes trailing/leading whitespaces and tabs from a line. */

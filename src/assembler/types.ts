@@ -3,7 +3,10 @@ import type { lexemeTypes } from "../data.js";
 export interface LexedProgram {
 	lines: LexedLine[];
 }
-export type LexedLine = Lexeme[];
+export type LexedLine = {
+	lexemes: Lexeme[];
+	rawText: string;
+};
 export type LexemeType = (typeof lexemeTypes) extends ReadonlyArray<infer T> ? T : never;
 export type MemoryLoadInstructions = [index:number, values:number[]][];
 export type MemoryValue = {address?: number, value: number};
@@ -23,6 +26,7 @@ export interface ProcessedProgram {
 export interface ProcessedLine {
 	statementDefinition:StatementDefinition;
 	lexemes: (Lexeme | null)[];
+	rawText: string;
 }
 
 export interface StatementDefinition {

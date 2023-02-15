@@ -32,9 +32,9 @@ export function processProgram(lexedProgram:LexedProgram):ProcessedProgram {
 }
 
 export function lineMatches(line:LexedLine, statement:StatementDefinition):false | ProcessedLine {
-	if(line.length > statement.maxLexemes) return false; //Too many lexemes
-	if(line.length < statement.minLexemes) return false; //Not enough lexemes
-	const lineCopy = line.slice();
+	if(line.lexemes.length > statement.maxLexemes) return false; //Too many lexemes
+	if(line.lexemes.length < statement.minLexemes) return false; //Not enough lexemes
+	const lineCopy = line.lexemes.slice();
 	const assignedLine:(Lexeme | null)[] = [];
 	for(const [i, matcher] of statement.lexemeMatchers.entries()){
 		const lexeme = lineCopy[0] as Lexeme | undefined;
@@ -53,7 +53,7 @@ export function lineMatches(line:LexedLine, statement:StatementDefinition):false
 	}
 	if(lineCopy.length > 0) return false; //Too many lexemes
 	return {
-		statementDefinition: statement, lexemes: assignedLine
+		statementDefinition: statement, lexemes: assignedLine, rawText: line.rawText
 	};
 }
 

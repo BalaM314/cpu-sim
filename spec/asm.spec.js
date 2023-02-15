@@ -4,19 +4,19 @@ import { processProgram, lineMatches, getStatementDefinition } from "../src/asse
 import { lexLine, lexProgram, processLexemeMatcherString } from "../src/assembler/lexer.js";
 describe("lexLine", () => {
     it("should convert a line to lexemes", () => {
-        expect(lexLine("NOP")).toEqual([
+        expect(lexLine("NOP").lexemes).toEqual([
             { type: "instruction", value: "NOP" }
         ]);
-        expect(lexLine("JPE 7")).toEqual([
+        expect(lexLine("JPE 7").lexemes).toEqual([
             { type: "instruction", value: "JPE" },
             { type: "number", value: "7" },
         ]);
-        expect(lexLine("0 LDD 51")).toEqual([
+        expect(lexLine("0 LDD 51").lexemes).toEqual([
             { type: "number", value: "0" },
             { type: "instruction", value: "LDD" },
             { type: "number", value: "51" },
         ]);
-        expect(lexLine("jumped: ADD 51")).toEqual([
+        expect(lexLine("jumped: ADD 51").lexemes).toEqual([
             { type: "label", value: "jumped:" },
             { type: "instruction", value: "ADD" },
             { type: "number", value: "51" },
@@ -37,22 +37,20 @@ END
 50 2
 51 2
 52 4`
-            .split("\n"))).toEqual({
-            lines: [
-                [{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }],
-                [{ type: "number", value: "1" }, { type: "instruction", value: "LDD" }, { type: "number", value: "50" }],
-                [{ type: "instruction", value: "ADD" }, { type: "number", value: "51" }],
-                [{ type: "instruction", value: "CMP" }, { type: "number", value: "52" }],
-                [{ type: "instruction", value: "JPE" }, { type: "number", value: "7" }],
-                [{ type: "instruction", value: "STO" }, { type: "number", value: "41" }],
-                [{ type: "instruction", value: "END" }],
-                [{ type: "label", value: "label:" }, { type: "instruction", value: "NOP" }],
-                [{ type: "instruction", value: "END" }],
-                [{ type: "number", value: "50" }, { type: "number", value: "2" }],
-                [{ type: "number", value: "51" }, { type: "number", value: "2" }],
-                [{ type: "number", value: "52" }, { type: "number", value: "4" }],
-            ]
-        });
+            .split("\n")).lines.map(l => l.lexemes)).toEqual([
+            [{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }],
+            [{ type: "number", value: "1" }, { type: "instruction", value: "LDD" }, { type: "number", value: "50" }],
+            [{ type: "instruction", value: "ADD" }, { type: "number", value: "51" }],
+            [{ type: "instruction", value: "CMP" }, { type: "number", value: "52" }],
+            [{ type: "instruction", value: "JPE" }, { type: "number", value: "7" }],
+            [{ type: "instruction", value: "STO" }, { type: "number", value: "41" }],
+            [{ type: "instruction", value: "END" }],
+            [{ type: "label", value: "label:" }, { type: "instruction", value: "NOP" }],
+            [{ type: "instruction", value: "END" }],
+            [{ type: "number", value: "50" }, { type: "number", value: "2" }],
+            [{ type: "number", value: "51" }, { type: "number", value: "2" }],
+            [{ type: "number", value: "52" }, { type: "number", value: "4" }],
+        ]);
     });
 });
 describe("processProgram", () => {
@@ -70,19 +68,19 @@ describe("processProgram", () => {
                 [{ type: "number", value: "50" }, { type: "number", value: "2" }],
                 [{ type: "number", value: "51" }, { type: "number", value: "2" }],
                 [{ type: "number", value: "52" }, { type: "number", value: "4" }],
-            ] })).toEqual({ lines: [
-                { statementDefinition: statements.instruction, lexemes: [{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }, null] },
-                { statementDefinition: statements.instruction, lexemes: [{ type: "number", value: "1" }, { type: "instruction", value: "LDD" }, { type: "number", value: "50" }] },
-                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "ADD" }, { type: "number", value: "51" }] },
-                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "CMP" }, { type: "number", value: "52" }] },
-                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "JPE" }, { type: "number", value: "7" }] },
-                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "STO" }, { type: "number", value: "41" }] },
-                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "END" }, null] },
-                { statementDefinition: statements.instruction, lexemes: [{ type: "label", value: "label:" }, { type: "instruction", value: "NOP" }, null] },
-                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "END" }, null] },
-                { statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "50" }, { type: "number", value: "2" }] },
-                { statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "51" }, { type: "number", value: "2" }] },
-                { statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "52" }, { type: "number", value: "4" }] },
+            ].map(lexemes => ({ lexemes, rawText: lexemes.map(l => l.value).join(" ") })) })).toEqual({ lines: [
+                { statementDefinition: statements.instruction, lexemes: [{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }, null], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [{ type: "number", value: "1" }, { type: "instruction", value: "LDD" }, { type: "number", value: "50" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "ADD" }, { type: "number", value: "51" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "CMP" }, { type: "number", value: "52" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "JPE" }, { type: "number", value: "7" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "STO" }, { type: "number", value: "41" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "END" }, null], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [{ type: "label", value: "label:" }, { type: "instruction", value: "NOP" }, null], rawText: jasmine.any(String) },
+                { statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "END" }, null], rawText: jasmine.any(String) },
+                { statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "50" }, { type: "number", value: "2" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "51" }, { type: "number", value: "2" }], rawText: jasmine.any(String) },
+                { statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "52" }, { type: "number", value: "4" }], rawText: jasmine.any(String) },
             ] });
     });
 });
@@ -118,31 +116,31 @@ describe("processLexemeMatcherString", () => {
 });
 describe("lineMatches", () => {
     it("should determine if a line matches a statement definition", () => {
-        const anyProcessedLine = { lexemes: jasmine.any(Array), statementDefinition: jasmine.any(Object) };
-        expect(lineMatches([{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }], statements.instruction)).toEqual(anyProcessedLine);
-        expect(lineMatches([{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }], statements.instruction)).toEqual(anyProcessedLine);
-        expect(lineMatches([{ type: "label", value: "sus:" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },], statements.instruction)).toEqual(anyProcessedLine);
-        expect(lineMatches([{ type: "number", value: "0" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },], statements.instruction)).toEqual(anyProcessedLine);
-        expect(lineMatches([{ type: "label", value: "sus:" }], statements.instruction)).toEqual(false);
-        expect(lineMatches([{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }, { type: "instruction", value: "NOP" }], statements.instruction)).toEqual(false);
-        expect(lineMatches([{ type: "instruction", value: "ADD" }, { type: "label", value: "sus:" }], statements.instruction)).toEqual(false);
-        expect(lineMatches([{ type: "number", value: "0" }, { type: "number", value: "23" },], statements.instruction)).toEqual(false);
-        expect(lineMatches([], statements.instruction)).toEqual(false);
-        expect(lineMatches([{ type: "number", value: "0" }], statements.instruction)).toEqual(false);
+        const anyProcessedLine = { lexemes: jasmine.any(Array), statementDefinition: jasmine.any(Object), rawText: jasmine.any(String) };
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }] }, statements.instruction)).toEqual(anyProcessedLine);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }] }, statements.instruction)).toEqual(anyProcessedLine);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "label", value: "sus:" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },] }, statements.instruction)).toEqual(anyProcessedLine);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "number", value: "0" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },] }, statements.instruction)).toEqual(anyProcessedLine);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "label", value: "sus:" }] }, statements.instruction)).toEqual(false);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }, { type: "instruction", value: "NOP" }] }, statements.instruction)).toEqual(false);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "instruction", value: "ADD" }, { type: "label", value: "sus:" }] }, statements.instruction)).toEqual(false);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "number", value: "0" }, { type: "number", value: "23" },] }, statements.instruction)).toEqual(false);
+        expect(lineMatches({ rawText: "", lexemes: [] }, statements.instruction)).toEqual(false);
+        expect(lineMatches({ rawText: "", lexemes: [{ type: "number", value: "0" }] }, statements.instruction)).toEqual(false);
     });
 });
 describe("getStatementDefinition", () => {
     it("should determine the statement definition that a line matches", () => {
         var _a, _b, _c, _d, _e;
-        expect((_a = getStatementDefinition([{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }])) === null || _a === void 0 ? void 0 : _a[0]).toEqual(statements.instruction);
-        expect((_b = getStatementDefinition([{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }])) === null || _b === void 0 ? void 0 : _b[0]).toEqual(statements.instruction);
-        expect((_c = getStatementDefinition([{ type: "label", value: "sus:" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },])) === null || _c === void 0 ? void 0 : _c[0]).toEqual(statements.instruction);
-        expect((_d = getStatementDefinition([{ type: "number", value: "0" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },])) === null || _d === void 0 ? void 0 : _d[0]).toEqual(statements.instruction);
-        expect(getStatementDefinition([{ type: "label", value: "sus:" }])).toEqual(null);
-        expect(getStatementDefinition([{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }, { type: "instruction", value: "NOP" }])).toEqual(null);
-        expect(getStatementDefinition([{ type: "instruction", value: "ADD" }, { type: "label", value: "sus:" }])).toEqual(null);
-        expect((_e = getStatementDefinition([{ type: "number", value: "0" }, { type: "number", value: "23" }])) === null || _e === void 0 ? void 0 : _e[0]).toEqual(statements.memoryValue);
-        expect(getStatementDefinition([])).toEqual(null);
-        expect(getStatementDefinition([{ type: "number", value: "0" }])).toEqual(null);
+        expect((_a = getStatementDefinition({ rawText: "", lexemes: [{ type: "number", value: "0" }, { type: "instruction", value: "NOP" }] })) === null || _a === void 0 ? void 0 : _a[0]).toEqual(statements.instruction);
+        expect((_b = getStatementDefinition({ rawText: "", lexemes: [{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }] })) === null || _b === void 0 ? void 0 : _b[0]).toEqual(statements.instruction);
+        expect((_c = getStatementDefinition({ rawText: "", lexemes: [{ type: "label", value: "sus:" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },] })) === null || _c === void 0 ? void 0 : _c[0]).toEqual(statements.instruction);
+        expect((_d = getStatementDefinition({ rawText: "", lexemes: [{ type: "number", value: "0" }, { type: "instruction", value: "ADD" }, { type: "number", value: "23" },] })) === null || _d === void 0 ? void 0 : _d[0]).toEqual(statements.instruction);
+        expect(getStatementDefinition({ rawText: "", lexemes: [{ type: "label", value: "sus:" }] })).toEqual(null);
+        expect(getStatementDefinition({ rawText: "", lexemes: [{ type: "label", value: "sus:" }, { type: "instruction", value: "NOP" }, { type: "instruction", value: "NOP" }] })).toEqual(null);
+        expect(getStatementDefinition({ rawText: "", lexemes: [{ type: "instruction", value: "ADD" }, { type: "label", value: "sus:" }] })).toEqual(null);
+        expect((_e = getStatementDefinition({ rawText: "", lexemes: [{ type: "number", value: "0" }, { type: "number", value: "23" }] })) === null || _e === void 0 ? void 0 : _e[0]).toEqual(statements.memoryValue);
+        expect(getStatementDefinition({ rawText: "", lexemes: [] })).toEqual(null);
+        expect(getStatementDefinition({ rawText: "", lexemes: [{ type: "number", value: "0" }] })).toEqual(null);
     });
 });
