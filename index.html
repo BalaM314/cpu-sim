@@ -18,6 +18,7 @@
 	<button id="reset">reset</button>
 	<button id="clear">clear</button>
 	<div id="cpu-status"></div>
+	<div id="error" style="color: red;"></div>
 	<script type="module">
 		import * as cpu_js from "./src/cpu.js";
 		import * as asm_js from "./src/assembler/assembler.js";
@@ -30,7 +31,11 @@
 		Object.assign(window, {mem, cpu});
 		document.querySelector("#memory").value = mem.dump();
 		document.querySelector("#assemble").onclick = e => {
-			mem.load(assembleProgram(document.querySelector("#assembly").value.split("\n")));
+			try {
+				mem.load(assembleProgram(document.querySelector("#assembly").value.split("\n")));
+			} catch(err){
+				document.querySelector("#error").innerText = err.message;
+			}
 			document.querySelector("#memory").value = mem.dump();
 		}
 		document.querySelector("#tick").onclick = e => {
