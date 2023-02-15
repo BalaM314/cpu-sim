@@ -58,6 +58,7 @@ export function lexLine(line:string):LexedLine {
 			if(chunk.match(/^[\dA-F]+$/i)) return { type: "hex_number", value: chunk };
 			if(chunk.match(/^\#\d+$/i)) return { type: "denary_number", value: chunk };
 			if(chunk.match(/^\w+\:$/i)) return { type: "label", value: chunk };
+			if(chunk.match(/^(ACC|IX|R1|R2|R3|R4)$/i)) return { type: "register", value: chunk };
 			throw new Error(`Invalid chunk ${chunk} in line ${line}`);
 		}),
 		rawText: line

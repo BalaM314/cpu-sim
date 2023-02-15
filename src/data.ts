@@ -4,7 +4,7 @@ import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
 import { processLexemeMatcherString } from "./assembler/lexer.js";
 
-export const lexemeTypes = ["hex_number", "denary_number", "instruction", "label"] as const;
+export const lexemeTypes = ["hex_number", "denary_number", "instruction", "label", "register"] as const;
 
 interface InstructionData {
 	code: string;
@@ -29,21 +29,21 @@ export const instructions: {
 			return { instructionPointerModified: true };
 		} else return {};
 	} },
-	[0x30]: { code: "LDM", exec(executor, operand){executor.registers.acc = operand; return {};} },
-	[0x31]: { code: "LDD", exec(executor, operand){executor.registers.acc = executor.mem.read(operand); return {};} },
-	[0x32]: { code: "LDI", exec(executor, operand){executor.registers.acc = executor.mem.read(executor.mem.read(operand)); return {};} },
-	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.acc); return {};} },
-	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.acc += executor.mem.read(operand); return {};} },
-	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.acc -= executor.mem.read(operand); return {};} },
-	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.acc *= executor.mem.read(operand); return {};} },
-	[0x53]: { code: "DIV", exec(executor, operand){executor.registers.acc = Math.trunc(executor.registers.acc / executor.mem.read(operand)); return {};} },
-	[0x54]: { code: "INC", exec(executor, operand){executor.registers.acc ++; return {};} },
-	[0x55]: { code: "AND", exec(executor, operand){executor.registers.acc &= executor.mem.read(operand); return {};} },
-	[0x56]: { code: "ORD", exec(executor, operand){executor.registers.acc |= executor.mem.read(operand); return {};} },
-	[0x57]: { code: "XOR", exec(executor, operand){executor.registers.acc ^= executor.mem.read(operand); return {};} },
-	[0x60]: { code: "CMP", exec(executor, operand){executor.flags.compare = executor.registers.acc == executor.mem.read(operand); return {};} },
-	[0x61]: { code: "SLT", exec(executor, operand){executor.flags.compare = executor.registers.acc < executor.mem.read(operand); return {};} },
-	[0x62]: { code: "SGT", exec(executor, operand){executor.flags.compare = executor.registers.acc > executor.mem.read(operand); return {};} },
+	[0x30]: { code: "LDM", exec(executor, operand){executor.registers.ACC = operand; return {};} },
+	[0x31]: { code: "LDD", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand); return {};} },
+	[0x32]: { code: "LDI", exec(executor, operand){executor.registers.ACC = executor.mem.read(executor.mem.read(operand)); return {};} },
+	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.ACC); return {};} },
+	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.ACC += executor.mem.read(operand); return {};} },
+	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.ACC -= executor.mem.read(operand); return {};} },
+	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.ACC *= executor.mem.read(operand); return {};} },
+	[0x53]: { code: "DIV", exec(executor, operand){executor.registers.ACC = Math.trunc(executor.registers.ACC / executor.mem.read(operand)); return {};} },
+	[0x54]: { code: "INC", exec(executor, operand){executor.registers.ACC ++; return {};} },
+	[0x55]: { code: "AND", exec(executor, operand){executor.registers.ACC &= executor.mem.read(operand); return {};} },
+	[0x56]: { code: "ORD", exec(executor, operand){executor.registers.ACC |= executor.mem.read(operand); return {};} },
+	[0x57]: { code: "XOR", exec(executor, operand){executor.registers.ACC ^= executor.mem.read(operand); return {};} },
+	[0x60]: { code: "CMP", exec(executor, operand){executor.flags.compare = executor.registers.ACC == executor.mem.read(operand); return {};} },
+	[0x61]: { code: "SLT", exec(executor, operand){executor.flags.compare = executor.registers.ACC < executor.mem.read(operand); return {};} },
+	[0x62]: { code: "SGT", exec(executor, operand){executor.flags.compare = executor.registers.ACC > executor.mem.read(operand); return {};} },
 	[0xFF]: { code: "", exec(executor, operand, opcode){
 		executor.on = false;
 		console.warn(`Invalid instruction at 0x${executor.instructionPointer.toString(16)} (${(opcode * 0x100 + operand).toString(16)})`);

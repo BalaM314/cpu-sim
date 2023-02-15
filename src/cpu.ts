@@ -60,7 +60,12 @@ export class ProgramExecutor {
 		compare: false
 	}
 	registers = {
-		acc: 0
+		ACC: 0,
+		IX: 0,
+		R1: 0,
+		R2: 0,
+		R3: 0,
+		R4: 0,
 	};
 	constructor(public mem:RAM, public instructionPointer = 0){}
 	tick(){
