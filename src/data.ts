@@ -1,3 +1,5 @@
+/** Copyright © BalaM314, 2023. */
+
 import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
 import { processLexemeMatcherString } from "./assembler/lexer.js";

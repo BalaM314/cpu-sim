@@ -1,3 +1,4 @@
+/** Copyright © BalaM314, 2023. */
 var _a;
 import { instructions } from "./data.js";
 import { toHex } from "./funcs.js";

@@ -1,3 +1,4 @@
+/** Copyright © BalaM314, 2023. */
 import { statements } from "../data.js";
 import { lexProgram } from "./lexer.js";
 export function assembleProgram(program) {

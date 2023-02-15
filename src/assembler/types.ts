@@ -1,3 +1,5 @@
+/** Copyright © BalaM314, 2023. */
+
 import type { lexemeTypes } from "../data.js";
 
 export interface LexedProgram {

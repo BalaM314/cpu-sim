@@ -1,3 +1,5 @@
+/** Copyright © BalaM314, 2023. */
+
 import type { MemoryLoadInstructions } from "./assembler/types.js";
 import { instructions } from "./data.js";
 import { toHex } from "./funcs.js";

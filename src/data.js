@@ -1,3 +1,4 @@
+/** Copyright © BalaM314, 2023. */
 import { processLexemeMatcherString } from "./assembler/lexer.js";
 export const lexemeTypes = ["number", "instruction", "label"];
 export const instructions = {

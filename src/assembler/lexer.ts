@@ -1,3 +1,5 @@
+/** Copyright © BalaM314, 2023. */
+
 import { lexemeTypes } from "../data.js";
 import type { LexedLine, LexedProgram, LexemeMatcher } from "./types.js";
 
