@@ -82,7 +82,18 @@ describe("processProgram", () => {
 			[{ type: "number", value: "51" }, { type: "number", value: "2" }],
 			[{ type: "number", value: "52" }, { type: "number", value: "4" }],
 		]})).toEqual({lines: [
-			
+			{statementDefinition: statements.instruction, lexemes: [{ type: "number", value: "0"}, { type: "instruction", value: "NOP" }, null]},
+			{statementDefinition: statements.instruction, lexemes: [{ type: "number", value: "1"}, { type: "instruction", value: "LDD" }, { type: "number", value: "50" }]},
+			{statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "ADD" }, { type: "number", value: "51" }]},
+			{statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "CMP" }, { type: "number", value: "52" }]},
+			{statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "JPE" }, { type: "number", value: "7" }]},
+			{statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "STO" }, { type: "number", value: "41" }]},
+			{statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "END" }, null]},
+			{statementDefinition: statements.instruction, lexemes: [{ type: "label", value: "label:" }, { type: "instruction", value: "NOP" }, null]},
+			{statementDefinition: statements.instruction, lexemes: [null, { type: "instruction", value: "END" }, null]},
+			{statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "50" }, { type: "number", value: "2" }]},
+			{statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "51" }, { type: "number", value: "2" }]},
+			{statementDefinition: statements.memoryValue, lexemes: [{ type: "number", value: "52" }, { type: "number", value: "4" }]},
 		]});
 	});
 });
@@ -143,7 +154,7 @@ describe("getStatementDefinition", () => {
 		expect(getStatementDefinition([{ type: "label", value: "sus:"}])).toEqual(null);
 		expect(getStatementDefinition([{ type: "label", value: "sus:"}, { type: "instruction", value: "NOP" }, { type: "instruction", value: "NOP" }])).toEqual(null);
 		expect(getStatementDefinition([{ type: "instruction", value: "ADD" }, { type: "label", value: "sus:" }])).toEqual(null);
-		expect(getStatementDefinition([{ type: "number", value: "0"}, { type: "number", value: "23"},])).toEqual(null);
+		expect(getStatementDefinition([{ type: "number", value: "0"}, { type: "number", value: "23"}])?.[0]).toEqual(statements.memoryValue);
 		expect(getStatementDefinition([])).toEqual(null);
 		expect(getStatementDefinition([{ type: "number", value: "0"}])).toEqual(null);
 	});
