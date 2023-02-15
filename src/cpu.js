@@ -1,41 +1,6 @@
 var _a;
-export const instructions = {
-    [0x00]: { code: "END", exec(executor) { executor.on = false; return {}; } },
-    [0x10]: { code: "NOP", exec() { return {}; } },
-    [0x20]: { code: "JPA", exec(executor, operand) { executor.instructionPointer = operand; return { instructionPointerModified: true }; } },
-    [0x21]: { code: "JPE", exec(executor, operand) {
-            if (executor.flags.compare) {
-                executor.instructionPointer = operand;
-                return { instructionPointerModified: true };
-            }
-            else
-                return {};
-        } },
-    [0x22]: { code: "JPN", exec(executor, operand) {
-            if (!executor.flags.compare) {
-                executor.instructionPointer = operand;
-                return { instructionPointerModified: true };
-            }
-            else
-                return {};
-        } },
-    [0x30]: { code: "LDM", exec(executor, operand) { executor.registers.acc = operand; return {}; } },
-    [0x31]: { code: "LDD", exec(executor, operand) { executor.registers.acc = executor.mem.read(operand); return {}; } },
-    [0x32]: { code: "LDI", exec(executor, operand) { executor.registers.acc = executor.mem.read(executor.mem.read(operand)); return {}; } },
-    [0x40]: { code: "STO", exec(executor, operand) { executor.mem.write(operand, executor.registers.acc); return {}; } },
-    [0x50]: { code: "ADD", exec(executor, operand) { executor.registers.acc += executor.mem.read(operand); return {}; } },
-    [0x54]: { code: "INC", exec(executor, operand) { executor.registers.acc++; return {}; } },
-    [0x60]: { code: "CMP", exec(executor, operand) { executor.flags.compare = executor.registers.acc == executor.mem.read(operand); return {}; } },
-    [0xFF]: { code: "", exec(executor, operand, opcode) {
-            executor.on = false;
-            console.warn(`Invalid instruction at 0x${executor.instructionPointer.toString(16)} (${(opcode * 0x100 + operand).toString(16)})`);
-            return {};
-        } },
-};
-export const instructionMapping = new Map(Object.entries(instructions).map(([id, data]) => [id, data.code].reverse()));
-function toHex(n, length = 4) {
-    return ("0000" + n.toString(16).toUpperCase()).slice(-length);
-}
+import { instructions } from "./data.js";
+import { toHex } from "./funcs.js";
 export class RAM {
     constructor(size) {
         this.storage = new Uint16Array(size);

@@ -1,5 +1,5 @@
 import "jasmine";
-import { getStatementDefinition, lexLine, lexProgram, lineMatches, ProcessedLine, processLexemeMatcherString, processProgram, statements } from "../src/asm.js";
+import { getStatementDefinition, lexLine, lexProgram, lineMatches, ProcessedLine, processLexemeMatcherString, processProgram, statements } from "../src/assembler/asm.js";
 
 
 

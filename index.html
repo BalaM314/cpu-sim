@@ -6,13 +6,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CPU Simulator</title>
 	<script src="src/cpu.js" type="module"></script>
-	<script src="src/asm.js" type="module"></script>
+	<script src="src/assembler/assembler.js" type="module"></script>
 </head>
 <body>
 	<h1>CPU Simulator</h1>
 	<script type="module">
 		import * as cpu_js from "./src/cpu.js";
-		import * as asm_js from "./src/asm.js";
+		import * as asm_js from "./src/assembler/assembler.js";
 		Object.assign(window, cpu_js);
 		Object.assign(window, asm_js);
 		const mem = new RAM(1024);
