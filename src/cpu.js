@@ -6,10 +6,16 @@ export class RAM {
         this.storage = new Uint16Array(size);
     }
     load(memoryValues) {
+        this.clear();
         for (const [index, values] of memoryValues) {
             for (const [i, value] of values.entries()) {
                 this.write(index + i, value);
             }
+        }
+    }
+    clear() {
+        for (let i = 0; i < this.storage.length; i++) {
+            this.storage[i] = 0;
         }
     }
     dump() {
@@ -25,6 +31,8 @@ export class RAM {
                 isSkipping = true;
             }
         }
+        if (output.length == 1 || output[0] == "...")
+            return "[empty]";
         return output.join("\n");
     }
     read(index) {

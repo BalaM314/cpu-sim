@@ -10,14 +10,43 @@
 </head>
 <body>
 	<h1>CPU Simulator</h1>
+	<textarea name="assembly" id="assembly" cols="100" rows="20"></textarea>
+	<textarea name="memory" id="memory" cols="100" rows="20"></textarea>
+	<br>
+	<button id="assemble">assemble</button>
+	<button id="tick">tick</button>
+	<button id="reset">reset</button>
+	<button id="clear">clear</button>
+	<div id="cpu-status"></div>
 	<script type="module">
 		import * as cpu_js from "./src/cpu.js";
 		import * as asm_js from "./src/assembler/assembler.js";
+		import * as funcs_js from "./src/funcs.js";
 		Object.assign(window, cpu_js);
 		Object.assign(window, asm_js);
+		Object.assign(window, funcs_js);
 		const mem = new RAM(1024);
 		const cpu = new ProgramExecutor(mem);
 		Object.assign(window, {mem, cpu});
+		document.querySelector("#memory").value = mem.dump();
+		document.querySelector("#assemble").onclick = e => {
+			mem.load(assembleProgram(document.querySelector("#assembly").value.split("\n")));
+			document.querySelector("#memory").value = mem.dump();
+		}
+		document.querySelector("#tick").onclick = e => {
+			cpu.tick();
+			document.querySelector("#memory").value = mem.dump();
+			document.querySelector("#cpu-status").innerText = `instruction pointer: ${cpu.instructionPointer - 1}, accumulator contents: ${toHex(cpu.registers.acc)}`;
+		}
+		document.querySelector("#reset").onclick = e => {
+			cpu.instructionPointer = 0;
+			cpu.on = true;
+			document.querySelector("#cpu-status").innerText = `cpu reset`;
+		}
+		document.querySelector("#clear").onclick = e => {
+			mem.clear();
+			document.querySelector("#memory").value = mem.dump();
+		}
 		
 	</script>
 </body>
