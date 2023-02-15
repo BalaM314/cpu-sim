@@ -34,6 +34,7 @@
 		document.querySelector("#assemble").onclick = e => {
 			try {
 				mem.load(assembleProgram(document.querySelector("#assembly").value.split("\n")));
+				document.querySelector("#error").innerText = "";
 			} catch(err){
 				document.querySelector("#error").innerText = err.message;
 			}
