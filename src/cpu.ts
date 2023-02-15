@@ -1,10 +1,12 @@
+import type { MemoryLoadInstructions } from "./asm.js";
+
 
 interface InstructionData {
 	code: string;
 	exec: (executor:ProgramExecutor, operand:number, opcode:number) => {instructionPointerModified?:boolean;};
 }
 
-const instructions: {
+export const instructions: {
 	[index: number]: InstructionData;
 } = {
 	[0x00]: { code: "END", exec(executor){executor.on = false; return {};} },
@@ -12,6 +14,12 @@ const instructions: {
 	[0x20]: { code: "JPA", exec(executor, operand){executor.instructionPointer = operand; return { instructionPointerModified: true };} },
 	[0x21]: { code: "JPE", exec(executor, operand){
 		if(executor.flags.compare){
+			executor.instructionPointer = operand;
+			return { instructionPointerModified: true };
+		} else return {};
+	} },
+	[0x22]: { code: "JPN", exec(executor, operand){
+		if(!executor.flags.compare){
 			executor.instructionPointer = operand;
 			return { instructionPointerModified: true };
 		} else return {};
@@ -29,15 +37,18 @@ const instructions: {
 		return {};
 	}},
 };
-
-class RAM {
+export const instructionMapping = new Map(Object.entries(instructions).map(([id, data]) => [id, data.code].reverse() as [code:string, id:string]));
+function toHex(n:number, length:number = 4){
+	return ("0000" + n.toString(16).toUpperCase()).slice(-length);
+}
+export class RAM {
 	private storage:Uint16Array;
 	static readonly bits = 16;
 	static readonly maxValue = 2 ** this.bits;
 	constructor(size:number){
 		this.storage = new Uint16Array(size);
 	}
-	load(memoryValues:[index:number, values:number[]][]){
+	load(memoryValues:MemoryLoadInstructions){
 		for(const [index, values] of memoryValues){
 			for(const [i, value] of values.entries()){
 				this.write(index + i, value);
@@ -45,7 +56,18 @@ class RAM {
 		}
 	}
 	dump(){
-		//NYI
+		const output:string[] = [];
+		let isSkipping = false;
+		for(let i = 0; i < this.storage.length; i ++){
+			if(this.storage[i] != 0){
+				output.push(`${toHex(i, 2)} ${toHex(this.storage[i], 4)}`);
+				isSkipping = false;
+			} else if(!isSkipping){
+				output.push("...");
+				isSkipping = true;
+			}
+		}
+		return output.join("\n");
 	}
 	read(index:number){
 		if(index in this.storage) return this.storage[index];
@@ -59,7 +81,7 @@ class RAM {
 	}
 }
 
-class ProgramExecutor {
+export class ProgramExecutor {
 	on = true;
 	flags = {
 		compare: false

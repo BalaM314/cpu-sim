@@ -1,11 +1,18 @@
-"use strict";
 var _a;
-const instructions = {
+export const instructions = {
     [0x00]: { code: "END", exec(executor) { executor.on = false; return {}; } },
     [0x10]: { code: "NOP", exec() { return {}; } },
     [0x20]: { code: "JPA", exec(executor, operand) { executor.instructionPointer = operand; return { instructionPointerModified: true }; } },
     [0x21]: { code: "JPE", exec(executor, operand) {
             if (executor.flags.compare) {
+                executor.instructionPointer = operand;
+                return { instructionPointerModified: true };
+            }
+            else
+                return {};
+        } },
+    [0x22]: { code: "JPN", exec(executor, operand) {
+            if (!executor.flags.compare) {
                 executor.instructionPointer = operand;
                 return { instructionPointerModified: true };
             }
@@ -25,7 +32,11 @@ const instructions = {
             return {};
         } },
 };
-class RAM {
+export const instructionMapping = new Map(Object.entries(instructions).map(([id, data]) => [id, data.code].reverse()));
+function toHex(n, length = 4) {
+    return ("0000" + n.toString(16).toUpperCase()).slice(-length);
+}
+export class RAM {
     constructor(size) {
         this.storage = new Uint16Array(size);
     }
@@ -37,7 +48,19 @@ class RAM {
         }
     }
     dump() {
-        //NYI
+        const output = [];
+        let isSkipping = false;
+        for (let i = 0; i < this.storage.length; i++) {
+            if (this.storage[i] != 0) {
+                output.push(`${toHex(i, 2)} ${toHex(this.storage[i], 4)}`);
+                isSkipping = false;
+            }
+            else if (!isSkipping) {
+                output.push("...");
+                isSkipping = true;
+            }
+        }
+        return output.join("\n");
     }
     read(index) {
         if (index in this.storage)
@@ -59,7 +82,7 @@ class RAM {
 _a = RAM;
 RAM.bits = 16;
 RAM.maxValue = 2 ** _a.bits;
-class ProgramExecutor {
+export class ProgramExecutor {
     constructor(mem, instructionPointer = 0) {
         this.mem = mem;
         this.instructionPointer = instructionPointer;
