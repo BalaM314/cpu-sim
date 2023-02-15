@@ -55,7 +55,8 @@ export function lexLine(line:string):LexedLine {
 	return {
 		lexemes: splitLineOnSpace(line).map(chunk => {
 			if(chunk.match(/^[a-z]{3}$/i)) return { type: "instruction", value: chunk };
-			if(chunk.match(/^\d+$/i)) return { type: "number", value: chunk };
+			if(chunk.match(/^[\dA-F]+$/i)) return { type: "hex_number", value: chunk };
+			if(chunk.match(/^\#\d+$/i)) return { type: "denary_number", value: chunk };
 			if(chunk.match(/^\w+\:$/i)) return { type: "label", value: chunk };
 			throw new Error(`Invalid chunk ${chunk} in line ${line}`);
 		}),
@@ -98,7 +99,7 @@ export function removeComments(line:string):string {
 			if(lastChar !== `\\` && char === `"`){
 				state.inDString = false;
 			}
-		} else if(char === "#"){
+		} else if(char === ";"){
 			state.inSComment = true;
 			lastChar = char;
 			continue;

@@ -4,7 +4,7 @@ import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
 import { processLexemeMatcherString } from "./assembler/lexer.js";
 
-export const lexemeTypes = ["number", "instruction", "label"] as const;
+export const lexemeTypes = ["hex_number", "denary_number", "instruction", "label"] as const;
 
 interface InstructionData {
 	code: string;
@@ -64,23 +64,23 @@ export const statements = (statements => Object.fromEntries(
 	}])
 ))({
 	instruction: {
-		lexemes: ["number|label?", "instruction", "number?"],
+		lexemes: ["hex_number|label?", "instruction", "hex_number|denary_number?"],
 		getOutput(line:ProcessedLine):MemoryValue {
 			const instruction = line.lexemes[1]!.value;
 			const id = instructionMapping.get(instruction);
 			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
 			return {
-				address: line.lexemes[0]?.type == "number" ? + line.lexemes[0].value : undefined,
-				value: (+id << 8) + +(line.lexemes[2]?.value ?? 0)
+				address: line.lexemes[0]?.type == "hex_number" ? parseInt(line.lexemes[0].value, 16) : undefined,
+				value: (+id << 8) + (line.lexemes[2]?.type == "hex_number" ? parseInt(line.lexemes[2].value, 16) : line.lexemes[2]?.type == "denary_number" ? parseInt(line.lexemes[2].value.slice(1)) : 0)
 			}
 		}
 	},
 	memoryValue: {
-		lexemes: ["number|label?", "number"],
+		lexemes: ["hex_number|label?", "hex_number|denary_number"],
 		getOutput(line:ProcessedLine):MemoryValue {
 			return {
-				address: line.lexemes[0]?.type == "number" ? + line.lexemes[0].value : undefined,
-				value: +(line.lexemes[1]!.value)
+				address: line.lexemes[0]?.type == "hex_number" ? parseInt(line.lexemes[0].value, 16) : undefined,
+				value: line.lexemes[1]!.type == "hex_number" ? parseInt(line.lexemes[1]!.value, 16) : line.lexemes[1]!.type == "denary_number" ? parseInt(line.lexemes[1]!.value.slice(1)) : 0
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 /** Copyright © BalaM314, 2023. */
 import { processLexemeMatcherString } from "./assembler/lexer.js";
-export const lexemeTypes = ["number", "instruction", "label"];
+export const lexemeTypes = ["hex_number", "denary_number", "instruction", "label"];
 export const instructions = {
     [0x00]: { code: "END", exec(executor) { executor.on = false; return {}; } },
     [0x10]: { code: "NOP", exec() { return {}; } },
@@ -46,7 +46,7 @@ export const instructionMapping = new Map(Object.entries(instructions).map(([id,
 export const statements = (statements => Object.fromEntries(Object.entries(statements)
     .map(([k, v]) => [k, Object.assign(Object.assign({}, v), { lexemeMatchers: v.lexemes.map(processLexemeMatcherString) })]).map(([k, v]) => [k, Object.assign(Object.assign({}, v), { maxLexemes: v.lexemeMatchers.length, minLexemes: v.lexemeMatchers.filter(m => !m.isOptional).length })])))({
     instruction: {
-        lexemes: ["number|label?", "instruction", "number?"],
+        lexemes: ["hex_number|label?", "instruction", "hex_number|denary_number?"],
         getOutput(line) {
             var _a, _b, _c;
             const instruction = line.lexemes[1].value;
@@ -54,18 +54,18 @@ export const statements = (statements => Object.fromEntries(Object.entries(state
             if (id == undefined)
                 throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
             return {
-                address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "number" ? +line.lexemes[0].value : undefined,
-                value: (+id << 8) + +((_c = (_b = line.lexemes[2]) === null || _b === void 0 ? void 0 : _b.value) !== null && _c !== void 0 ? _c : 0)
+                address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "hex_number" ? parseInt(line.lexemes[0].value, 16) : undefined,
+                value: (+id << 8) + (((_b = line.lexemes[2]) === null || _b === void 0 ? void 0 : _b.type) == "hex_number" ? parseInt(line.lexemes[2].value, 16) : ((_c = line.lexemes[2]) === null || _c === void 0 ? void 0 : _c.type) == "denary_number" ? parseInt(line.lexemes[2].value.slice(1)) : 0)
             };
         }
     },
     memoryValue: {
-        lexemes: ["number|label?", "number"],
+        lexemes: ["hex_number|label?", "hex_number|denary_number"],
         getOutput(line) {
             var _a;
             return {
-                address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "number" ? +line.lexemes[0].value : undefined,
-                value: +(line.lexemes[1].value)
+                address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "hex_number" ? parseInt(line.lexemes[0].value, 16) : undefined,
+                value: line.lexemes[1].type == "hex_number" ? parseInt(line.lexemes[1].value, 16) : line.lexemes[1].type == "denary_number" ? parseInt(line.lexemes[1].value.slice(1)) : 0
             };
         }
     }
