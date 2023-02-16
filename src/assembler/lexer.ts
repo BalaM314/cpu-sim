@@ -134,6 +134,6 @@ export function cleanLine(line:string):string {
 }
 
 export function lexProgram(program:string[]):LexedProgram {
-	const lines = program.map(cleanLine).filter(line => line).map(line => lexLine(line));
+	const lines = program.map(line => cleanLine(line.toUpperCase())).filter(line => line).map(line => lexLine(line));
 	return { lines };
 }
