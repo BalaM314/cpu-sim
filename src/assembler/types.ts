@@ -14,6 +14,8 @@ export type MemoryLoadInstructions = [index:number, values:number[]][];
 export type MemoryValue = {address?: number, value: number};
 export interface Lexeme {
 	text: string;
+	value?: number;
+	variant?: string;
 	type: LexemeType;
 }
 

@@ -57,9 +57,9 @@ export function lexLine(line) {
             if (chunk.match(/^[a-z]{3}$/i))
                 return { type: "instruction", text: chunk };
             if (chunk.match(/^[\dA-F]+$/i))
-                return { type: "hex_number", text: chunk };
+                return { type: "number", variant: "hex", text: chunk, value: parseInt(chunk, 16) };
             if (chunk.match(/^\#\d+$/i))
-                return { type: "denary_number", text: chunk };
+                return { type: "number", variant: "denary", text: chunk, value: parseInt(chunk.slice(1)) };
             if (chunk.match(/^\w+\:$/i))
                 return { type: "label", text: chunk };
             if (chunk.match(/^(ACC|IX|R1|R2|R3|R4)$/i))
