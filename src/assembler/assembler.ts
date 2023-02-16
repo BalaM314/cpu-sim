@@ -3,24 +3,29 @@
 import { statements } from "../data.js";
 import { lexProgram } from "./lexer.js";
 import type {
-	ProcessedLine, MemoryLoadInstructions, LexedProgram, ProcessedProgram, LexedLine, StatementDefinition, Lexeme
+	ProcessedLine, MemoryLoadInstructions, LexedProgram, ProcessedProgram, LexedLine, StatementDefinition, Lexeme, MemoryValue
 } from "./types.js";
 
 
 
 export function assembleProgram(program:string[]):MemoryLoadInstructions {
-	const lexedProgram = lexProgram(program);
-	const processedProgram = processProgram(lexedProgram);
-	const memoryValues = processedProgram.lines.map(line => line.statementDefinition.getOutput(line));
-	const memoryLoadInstructions = memoryValues.reduce((acc, val) => {
-		if(val.address != undefined)
-			acc.push([val.address, [val.value]]);
-		else
-			acc.at(-1)![1].push(val.value);
-		return acc;
-	}, [[0, []]] as MemoryLoadInstructions);
-	return memoryLoadInstructions;
+	return compileMemoryLoadInstructions(
+		processProgram(
+			lexProgram(
+				program
+			)
+		).lines.map(line => line.statementDefinition.getOutput(line))
+	);
 	
+}
+
+export function compileMemoryLoadInstructions(values:MemoryValue[]):MemoryLoadInstructions {
+	let instructions:MemoryLoadInstructions = [[0, []]];
+	for(const {address, value} of values){
+		if(address != undefined) instructions.push([address, [value]]);
+		else instructions.at(-1)!.push(value);
+	}
+	return instructions;
 }
 
 export function processProgram(lexedProgram:LexedProgram):ProcessedProgram {
@@ -34,6 +39,7 @@ export function processProgram(lexedProgram:LexedProgram):ProcessedProgram {
 }
 
 export function lineMatches(line:LexedLine, statement:StatementDefinition):false | ProcessedLine {
+	//TODO this implementation is questionable
 	if(line.lexemes.length > statement.maxLexemes) return false; //Too many lexemes
 	if(line.lexemes.length < statement.minLexemes) return false; //Not enough lexemes
 	const lineCopy = line.lexemes.slice();

@@ -13,7 +13,7 @@ export type LexemeType = (typeof lexemeTypes) extends ReadonlyArray<infer T> ? T
 export type MemoryLoadInstructions = [index:number, values:number[]][];
 export type MemoryValue = {address?: number, value: number};
 export interface Lexeme {
-	value: string;
+	text: string;
 	type: LexemeType;
 }
 

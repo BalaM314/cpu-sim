@@ -66,12 +66,12 @@ export const statements = (statements => Object.fromEntries(
 	instruction: {
 		lexemes: ["hex_number|label?", "instruction", "hex_number|denary_number?"],
 		getOutput(line:ProcessedLine):MemoryValue {
-			const instruction = line.lexemes[1]!.value;
+			const instruction = line.lexemes[1]!.text;
 			const id = instructionMapping.get(instruction);
 			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
 			return {
-				address: line.lexemes[0]?.type == "hex_number" ? parseInt(line.lexemes[0].value, 16) : undefined,
-				value: (+id << 8) + (line.lexemes[2]?.type == "hex_number" ? parseInt(line.lexemes[2].value, 16) : line.lexemes[2]?.type == "denary_number" ? parseInt(line.lexemes[2].value.slice(1)) : 0)
+				address: line.lexemes[0]?.type == "hex_number" ? parseInt(line.lexemes[0].text, 16) : undefined,
+				value: (+id << 8) + (line.lexemes[2]?.type == "hex_number" ? parseInt(line.lexemes[2].text, 16) : line.lexemes[2]?.type == "denary_number" ? parseInt(line.lexemes[2].text.slice(1)) : 0)
 			}
 		}
 	},
@@ -79,8 +79,8 @@ export const statements = (statements => Object.fromEntries(
 		lexemes: ["hex_number|label?", "hex_number|denary_number"],
 		getOutput(line:ProcessedLine):MemoryValue {
 			return {
-				address: line.lexemes[0]?.type == "hex_number" ? parseInt(line.lexemes[0].value, 16) : undefined,
-				value: line.lexemes[1]!.type == "hex_number" ? parseInt(line.lexemes[1]!.value, 16) : line.lexemes[1]!.type == "denary_number" ? parseInt(line.lexemes[1]!.value.slice(1)) : 0
+				address: line.lexemes[0]?.type == "hex_number" ? parseInt(line.lexemes[0].text, 16) : undefined,
+				value: line.lexemes[1]!.type == "hex_number" ? parseInt(line.lexemes[1]!.text, 16) : line.lexemes[1]!.type == "denary_number" ? parseInt(line.lexemes[1]!.text.slice(1)) : 0
 			}
 		}
 	}

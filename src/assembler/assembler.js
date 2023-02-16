@@ -2,17 +2,17 @@
 import { statements } from "../data.js";
 import { lexProgram } from "./lexer.js";
 export function assembleProgram(program) {
-    const lexedProgram = lexProgram(program);
-    const processedProgram = processProgram(lexedProgram);
-    const memoryValues = processedProgram.lines.map(line => line.statementDefinition.getOutput(line));
-    const memoryLoadInstructions = memoryValues.reduce((acc, val) => {
-        if (val.address != undefined)
-            acc.push([val.address, [val.value]]);
+    return compileMemoryLoadInstructions(processProgram(lexProgram(program)).lines.map(line => line.statementDefinition.getOutput(line)));
+}
+export function compileMemoryLoadInstructions(values) {
+    let instructions = [[0, []]];
+    for (const { address, value } of values) {
+        if (address != undefined)
+            instructions.push([address, [value]]);
         else
-            acc.at(-1)[1].push(val.value);
-        return acc;
-    }, [[0, []]]);
-    return memoryLoadInstructions;
+            instructions.at(-1).push(value);
+    }
+    return instructions;
 }
 export function processProgram(lexedProgram) {
     const lines = [];
@@ -25,6 +25,7 @@ export function processProgram(lexedProgram) {
     return { lines };
 }
 export function lineMatches(line, statement) {
+    //TODO this implementation is questionable
     if (line.lexemes.length > statement.maxLexemes)
         return false; //Too many lexemes
     if (line.lexemes.length < statement.minLexemes)
