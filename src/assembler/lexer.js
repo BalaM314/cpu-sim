@@ -140,6 +140,6 @@ export function cleanLine(line) {
     return removeTrailingSpaces(removeComments(line));
 }
 export function lexProgram(program) {
-    const lines = program.map(line => cleanLine(line.toUpperCase())).filter(line => line).map(line => lexLine(line));
+    const lines = program.map(cleanLine).filter(line => line).map(line => lexLine(line));
     return { lines };
 }

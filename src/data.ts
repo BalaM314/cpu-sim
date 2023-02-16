@@ -67,7 +67,7 @@ export const statements = (statements => Object.fromEntries(
 		lexemes: ["number|label?", "instruction", "number?"],
 		getOutput(line:ProcessedLine):MemoryValue {
 			const instruction = line.lexemes[1]!.text;
-			const id = instructionMapping.get(instruction);
+			const id = instructionMapping.get(instruction.toUpperCase());
 			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
 			return {
 				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined,

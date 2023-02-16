@@ -50,7 +50,7 @@ export const statements = (statements => Object.fromEntries(Object.entries(state
         getOutput(line) {
             var _a, _b;
             const instruction = line.lexemes[1].text;
-            const id = instructionMapping.get(instruction);
+            const id = instructionMapping.get(instruction.toUpperCase());
             if (id == undefined)
                 throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
             return {
