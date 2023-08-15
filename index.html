@@ -43,7 +43,7 @@
 		document.querySelector("#tick").onclick = e => {
 			cpu.tick();
 			document.querySelector("#memory").value = mem.dump();
-			document.querySelector("#cpu-status").innerText = `instruction pointer: ${cpu.instructionPointer - 1}, accumulator contents: ${toHex(cpu.registers.acc)}`;
+			document.querySelector("#cpu-status").innerText = `instruction pointer: ${cpu.instructionPointer - 1}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
 		}
 		document.querySelector("#reset").onclick = e => {
 			cpu.instructionPointer = 0;
