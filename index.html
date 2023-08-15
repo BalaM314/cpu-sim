@@ -17,7 +17,7 @@
 	<button id="assemble">assemble</button>
 	<button id="tick">tick</button>
 	<button id="reset">reset</button>
-	<button id="clear">clear</button>
+	<button id="clear">clear memory</button>
 	<div id="cpu-status"></div>
 	<div id="error" style="color: red;"></div>
 	<script type="module">
@@ -52,6 +52,7 @@
 		}
 		document.querySelector("#clear").onclick = e => {
 			mem.clear();
+			cpu.instructionPointer = 0;
 			document.querySelector("#memory").value = mem.dump();
 		}
 		
