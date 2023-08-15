@@ -24,7 +24,7 @@ export class RAM {
         let isSkipping = false;
         for (let i = 0; i < this.storage.length; i++) {
             if (this.storage[i] != 0) {
-                output.push(`${toHex(i, 2)} ${toHex(this.storage[i], 4)}`);
+                output.push(`${toHex(i, 4)} ${toHex(this.storage[i], 4)}`);
                 isSkipping = false;
             }
             else if (!isSkipping) {
