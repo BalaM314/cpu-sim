@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2023. */
+/** Copyright © BalaM314, 2024. All Rights Reserved. */
 
 import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
@@ -32,7 +32,11 @@ export const instructions: {
 	[0x30]: { code: "LDM", exec(executor, operand){executor.registers.ACC = operand; return {};} },
 	[0x31]: { code: "LDD", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand); return {};} },
 	[0x32]: { code: "LDI", exec(executor, operand){executor.registers.ACC = executor.mem.read(executor.mem.read(operand)); return {};} },
+	[0x33]: { code: "LDX", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand + executor.registers.IX); return {};} },
+	[0x34]: { code: "LDR", exec(executor, operand){executor.registers.IX = operand; return {};} },
 	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.ACC); return {};} },
+	[0x41]: { code: "STD", exec(executor, operand){executor.mem.write(executor.mem.read(operand), executor.registers.ACC); return {};} },
+	// [0x42]: { code: "MOV", exec(executor, operand){executor.registers[operand] = executor.registers.ACC; return {};} },
 	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.ACC += executor.mem.read(operand); return {};} },
 	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.ACC -= executor.mem.read(operand); return {};} },
 	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.ACC *= executor.mem.read(operand); return {};} },
@@ -70,7 +74,7 @@ export const statements = (statements => Object.fromEntries(
 			const id = instructionMapping.get(instruction.toUpperCase());
 			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
 			return {
-				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined,
+				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined, //TODO fix blank addresses
 				value: (+id << 8) + (line.lexemes[2]?.type == "number" ? line.lexemes[2].value! : 0)
 			}
 		}

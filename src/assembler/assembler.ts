@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2023. */
+/** Copyright © BalaM314, 2024. */
 
 import { statements } from "../data.js";
 import { lexProgram } from "./lexer.js";
