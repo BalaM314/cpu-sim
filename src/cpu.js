@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2023. */
+/** Copyright © BalaM314, 2024. */
 var _a;
 import { instructions } from "./data.js";
 import { toHex } from "./funcs.js";
@@ -45,7 +45,7 @@ export class RAM {
     write(index, value) {
         if (!Number.isInteger(value))
             throw new Error(`Value ${value} is not an integer`);
-        if (value < 0 || value > RAM.maxValue)
+        if (value < 0 || value > _a.maxValue)
             throw new Error(`Value "${value}" is not a valid 16-bit integer`);
         if (index in this.storage)
             this.storage[index] = value;

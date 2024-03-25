@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2023. */
+/** Copyright © BalaM314, 2024. All Rights Reserved. */
 import { processLexemeMatcherString } from "./assembler/lexer.js";
 export const lexemeTypes = ["number", "instruction", "label", "register"];
 export const instructions = {
@@ -28,7 +28,7 @@ export const instructions = {
     [0x34]: { code: "LDR", exec(executor, operand) { executor.registers.IX = operand; return {}; } },
     [0x40]: { code: "STO", exec(executor, operand) { executor.mem.write(operand, executor.registers.ACC); return {}; } },
     [0x41]: { code: "STD", exec(executor, operand) { executor.mem.write(executor.mem.read(operand), executor.registers.ACC); return {}; } },
-    [0x42]: { code: "MOV", exec(executor, operand) { executor.registers[operand] = executor.registers.ACC; return {}; } },
+    // [0x42]: { code: "MOV", exec(executor, operand){executor.registers[operand] = executor.registers.ACC; return {};} },
     [0x50]: { code: "ADD", exec(executor, operand) { executor.registers.ACC += executor.mem.read(operand); return {}; } },
     [0x51]: { code: "SUB", exec(executor, operand) { executor.registers.ACC -= executor.mem.read(operand); return {}; } },
     [0x52]: { code: "MUL", exec(executor, operand) { executor.registers.ACC *= executor.mem.read(operand); return {}; } },

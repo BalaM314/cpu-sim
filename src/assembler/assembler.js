@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2023. */
+/** Copyright © BalaM314, 2024. */
 import { statements } from "../data.js";
 import { lexProgram } from "./lexer.js";
 export function assembleProgram(program) {
@@ -10,7 +10,7 @@ export function compileMemoryLoadInstructions(values) {
         if (address != undefined)
             instructions.push([address, [value]]);
         else
-            instructions.at(-1).push(value);
+            instructions.at(-1)[1].push(value);
     }
     return instructions;
 }

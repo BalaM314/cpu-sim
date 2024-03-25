@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2023. */
+/** Copyright © BalaM314, 2024. */
 import "jasmine";
 import { statements } from "../src/data.js";
 import { processProgram, lineMatches, getStatementDefinition } from "../src/assembler/assembler.js";

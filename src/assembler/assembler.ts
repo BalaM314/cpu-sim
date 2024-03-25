@@ -23,7 +23,7 @@ export function compileMemoryLoadInstructions(values:MemoryValue[]):MemoryLoadIn
 	let instructions:MemoryLoadInstructions = [[0, []]];
 	for(const {address, value} of values){
 		if(address != undefined) instructions.push([address, [value]]);
-		else instructions.at(-1)!.push(value);
+		else instructions.at(-1)![1].push(value);
 	}
 	return instructions;
 }
