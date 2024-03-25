@@ -23,10 +23,12 @@
 	<script type="module">
 		import * as cpu_js from "./src/cpu.js";
 		import * as asm_js from "./src/assembler/assembler.js";
+		import * as lexer_js from "./src/assembler/lexer.js";
 		import * as funcs_js from "./src/funcs.js";
 		Object.assign(window, cpu_js);
 		Object.assign(window, asm_js);
 		Object.assign(window, funcs_js);
+		Object.assign(window, lexer_js);
 		const mem = new RAM(1024);
 		const cpu = new ProgramExecutor(mem);
 		Object.assign(window, {mem, cpu});
