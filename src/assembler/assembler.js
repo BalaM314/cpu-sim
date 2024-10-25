@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. */
+/** Copyright © BalaM314, 2024. MIT License. */
 import { statements } from "../data.js";
 import { lexProgram } from "./lexer.js";
 export function assembleProgram(program) {

@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. */
+/** Copyright © BalaM314, 2024. MIT License. */
 import { lexemeTypes } from "../data.js";
 export function splitLineOnSpace(line) {
     if (line.includes(`"`)) {

@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. */
+/** Copyright © BalaM314, 2024. MIT License. */
 
 import type { MemoryLoadInstructions } from "./assembler/types.js";
 import { instructions } from "./data.js";

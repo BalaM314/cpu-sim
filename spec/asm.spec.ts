@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. */
+/** Copyright © BalaM314, 2024. MIT License. */
 
 import "jasmine";
 import type { LexedLine, ProcessedLine } from "../src/assembler/types.js";

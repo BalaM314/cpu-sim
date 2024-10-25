@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. All Rights Reserved. */
+/** Copyright © BalaM314, 2024. MIT License. */
 import { processLexemeMatcherString } from "./assembler/lexer.js";
 export const lexemeTypes = ["number", "instruction", "label", "register"];
 export const instructions = {
@@ -58,7 +58,7 @@ export const statements = (statements => Object.fromEntries(Object.entries(state
             if (id == undefined)
                 throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
             return {
-                address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "number" ? line.lexemes[0].value : undefined,
+                address: ((_a = line.lexemes[0]) === null || _a === void 0 ? void 0 : _a.type) == "number" ? line.lexemes[0].value : undefined, //TODO fix blank addresses
                 value: (+id << 8) + (((_b = line.lexemes[2]) === null || _b === void 0 ? void 0 : _b.type) == "number" ? line.lexemes[2].value : 0)
             };
         }

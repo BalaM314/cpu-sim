@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. */
+/** Copyright © BalaM314, 2024. MIT License. */
 var _a;
 import { instructions } from "./data.js";
 import { toHex } from "./funcs.js";
