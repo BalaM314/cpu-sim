@@ -14,7 +14,7 @@ interface InstructionData {
 export const instructions: {
 	[index: number]: InstructionData;
 } = {
-	[0x00]: { code: "END", exec(executor){executor.on = false; return {};} },
+	[0x01]: { code: "END", exec(executor){executor.on = false; return {};} },
 	[0x10]: { code: "NOP", exec(){return {};} },
 	[0x20]: { code: "JPA", exec(executor, operand){executor.instructionPointer = operand; return { instructionPointerModified: true };} },
 	[0x21]: { code: "JPE", exec(executor, operand){
