@@ -20,6 +20,7 @@
 	<button id="clear">clear memory</button>
 	<div id="cpu-status"></div>
 	<div id="error" style="color: red;"></div>
+	<div id="footer">Copyright © BalaM314, 2024. MIT License. <a href="https://github.com/BalaM314/cpu-sim/">Open source.</a></div>
 	<script type="module">
 		import * as cpu_js from "./src/cpu.js";
 		import * as asm_js from "./src/assembler/assembler.js";
@@ -32,6 +33,23 @@
 		const mem = new RAM(1024);
 		const cpu = new ProgramExecutor(mem);
 		Object.assign(window, {mem, cpu});
+		const sampleProgram = `start: LDD 80 //Load the value at address 80 into the accumulator
+ADD 81 //Add the value at address 81
+STO 80 //Store the result to address 80
+JPA 10 //Jump to address 10
+
+10 LDD 80
+11 SGT 82 //Check if ACC is greater than the value in address 82
+12 JPN 0 //If not, jump to address 0
+13 END
+
+//Store these numbers in these addresses
+80 15
+81 15
+82 60`;
+		if(!document.querySelector("#assembly").value){
+			document.querySelector("#assembly").value = sampleProgram;
+		}
 		document.querySelector("#memory").value = mem.dump();
 		document.querySelector("#assemble").onclick = e => {
 			try {
@@ -45,7 +63,7 @@
 		document.querySelector("#tick").onclick = e => {
 			cpu.tick();
 			document.querySelector("#memory").value = mem.dump();
-			document.querySelector("#cpu-status").innerText = `instruction pointer: ${cpu.instructionPointer - 1}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
+			document.querySelector("#cpu-status").innerText = `instruction pointer: ${toHex(cpu.instructionPointer - 1)}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
 		}
 		document.querySelector("#reset").onclick = e => {
 			cpu.instructionPointer = 0;
