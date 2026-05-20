@@ -76,7 +76,7 @@ export const instructionMapping = new Map(Object.entries(instructions).map(([id,
 export const statements = (statements => Object.fromEntries(Object.entries(statements)
     .map(([k, v]) => [k, Object.assign(Object.assign({}, v), { lexemeMatchers: v.lexemes.map(processLexemeMatcherString) })]).map(([k, v]) => [k, Object.assign(Object.assign({}, v), { maxLexemes: v.lexemeMatchers.length, minLexemes: v.lexemeMatchers.filter(m => !m.isOptional).length })])))({
     instruction: {
-        lexemes: ["number|label?", "instruction", "number?"],
+        lexemes: ["number|label?", "instruction", "number?"], //TODO: the labels are completely useless. Replace labels with the corresponding address. Also allow both label and address, like loop_start: 50 LDD 61
         getOutput(line) {
             var _a, _b;
             const instruction = line.lexemes[1].text;

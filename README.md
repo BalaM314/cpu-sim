@@ -53,4 +53,6 @@ The CPU executes machine code, one instruction at a time. It fetches the instruc
 |0x61|SLT|Checks if the accumulator is less than the value at the provided address.|
 |0x62|SGT|Checks if the accumulator is greater than the value at the provided address.|
 
+## Sample programs
+[programs/](programs/)
 

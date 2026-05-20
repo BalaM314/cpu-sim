@@ -104,7 +104,7 @@ export const statements = (statements => Object.fromEntries(
 	}])
 ))({
 	instruction: {
-		lexemes: ["number|label?", "instruction", "number?"],
+		lexemes: ["number|label?", "instruction", "number?"], //TODO: the labels are completely useless. Replace labels with the corresponding address. Also allow both label and address, like loop_start: 50 LDD 61
 		getOutput(line:ProcessedLine):MemoryValue {
 			const instruction = line.lexemes[1]!.text;
 			const id = instructionMapping.get(instruction.toUpperCase());
