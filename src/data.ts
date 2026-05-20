@@ -11,6 +11,19 @@ interface InstructionData {
 	exec: (executor:ProgramExecutor, operand:number, opcode:number) => {instructionPointerModified?:boolean;};
 }
 
+export const registers = ["ACC", "IX", "R1", "R2", "R3", "R4"] as const;
+export type Register = (typeof registers)[number];
+
+function decodeRegister(number:number):Register | undefined {
+	return registers[number];
+}
+function encodeRegister(register:Register):number;
+function encodeRegister(register:string):number | null;
+function encodeRegister(register:string):number | null {
+	const ind = (registers as readonly string[]).indexOf(register);
+	if(ind == -1) return null; else return ind;
+}
+
 export const instructions: {
 	[index: number]: InstructionData;
 } = {
@@ -41,7 +54,15 @@ export const instructions: {
 	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.ACC -= executor.mem.read(operand); return {};} },
 	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.ACC *= executor.mem.read(operand); return {};} },
 	[0x53]: { code: "DIV", exec(executor, operand){executor.registers.ACC = Math.trunc(executor.registers.ACC / executor.mem.read(operand)); return {};} },
-	[0x54]: { code: "INC", exec(executor, operand){executor.registers.ACC ++; return {};} },
+	[0x54]: { code: "INC", exec(executor, operand){
+		const reg = decodeRegister(operand);
+		if(reg) executor.registers[reg] ++;
+		else {
+			executor.on = false;
+			console.warn(`Invalid INC instruction at 0x${executor.instructionPointer.toString(16)} (${(0x54 * 0x100 + operand).toString(16)}): invalid register`);
+		}
+		return {};
+	} },
 	[0x55]: { code: "AND", exec(executor, operand){executor.registers.ACC &= executor.mem.read(operand); return {};} },
 	[0x56]: { code: "ORD", exec(executor, operand){executor.registers.ACC |= executor.mem.read(operand); return {};} },
 	[0x57]: { code: "XOR", exec(executor, operand){executor.registers.ACC ^= executor.mem.read(operand); return {};} },
@@ -76,6 +97,19 @@ export const statements = (statements => Object.fromEntries(
 			return {
 				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined, //TODO fix blank addresses
 				value: (+id << 8) + (line.lexemes[2]?.type == "number" ? line.lexemes[2].value! : 0)
+			}
+		}
+	},
+	instruction2: { //one register as operand
+		lexemes: ["number|label?", "instruction", "register"],
+		getOutput(line:ProcessedLine):MemoryValue {
+			const instruction = line.lexemes[1]!.text;
+			const id = instructionMapping.get(instruction.toUpperCase());
+			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
+			const reg = encodeRegister(line.lexemes[2]!.text) ?? crash(`Register ${line.lexemes[2]!.text} was invalid`);
+			return {
+				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined,
+				value: (+id << 8) + reg,
 			}
 		}
 	},
