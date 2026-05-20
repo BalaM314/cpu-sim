@@ -1,7 +1,20 @@
 {
+  "name": "cpu-sim",
+  "author": "BalaM314",
+  "version": "1.0.0",
+  "description": "Simulation of a 16-bit von Neumann computer, with CPU and memory.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BalaM314/cpu-sim.git"
+  },
   "devDependencies": {
     "@types/jasmine": "^4.3.1",
-    "jasmine": "^4.5.0"
+    "jasmine": "^4.5.0",
+    "typescript": "^6.0.3"
   },
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "test": "jasmine",
+    "watch": "tsc -w"
+  }
 }
