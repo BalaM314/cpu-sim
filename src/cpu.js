@@ -93,7 +93,7 @@ export class ProgramExecutor {
         };
     }
     tick() {
-        var _b;
+        var _b, _c;
         if (!this.on)
             return;
         //fetch
@@ -103,7 +103,11 @@ export class ProgramExecutor {
         const operand = instructionData & 0x00FF;
         const instruction = (_b = instructions[opcode]) !== null && _b !== void 0 ? _b : instructions[0xFF];
         //execute
-        const { instructionPointerModified } = instruction.exec(this, operand, opcode);
+        const { instructionPointerModified, error } = (_c = instruction.exec(this, operand, opcode)) !== null && _c !== void 0 ? _c : {};
+        if (error) {
+            this.on = false;
+            return error;
+        }
         if (!instructionPointerModified)
             this.instructionPointer++;
     }

@@ -87,7 +87,7 @@ export class ProgramExecutor {
 		this.on = true;
 	}
 	constructor(public mem:RAM, public instructionPointer = 0){}
-	tick(){
+	tick():string | undefined {
 		if(!this.on) return;
 
 		//fetch
@@ -99,7 +99,11 @@ export class ProgramExecutor {
 		const instruction = instructions[opcode] ?? instructions[0xFF];
 
 		//execute
-		const { instructionPointerModified } = instruction.exec(this, operand, opcode);
+		const { instructionPointerModified, error } = instruction.exec(this, operand, opcode) ?? {};
+		if(error){
+			this.on = false;
+			return error;
+		}
 		
 		if(!instructionPointerModified) this.instructionPointer ++;
 

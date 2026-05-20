@@ -3,13 +3,17 @@
 import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
 import { processLexemeMatcherString } from "./assembler/lexer.js";
-import { crash } from "./funcs.js";
+import { crash, toHex } from "./funcs.js";
 
 export const lexemeTypes = ["number", "instruction", "label", "register"] as const;
 
 interface InstructionData {
 	code: string;
-	exec: (executor:ProgramExecutor, operand:number, opcode:number) => {instructionPointerModified?:boolean;};
+	exec: (executor:ProgramExecutor, operand:number, opcode:number) => ({
+		instructionPointerModified?: boolean;
+		/** If an error is returned, the CPU will halt. */
+		error?: string;
+	} | undefined);
 }
 
 export const registers = ["ACC", "IX", "R1", "R2", "R3", "R4"] as const;
@@ -28,62 +32,58 @@ function encodeRegister(register:string):number | null {
 export const instructions: {
 	[index: number]: InstructionData;
 } = {
-	[0x01]: { code: "END", exec(executor){executor.on = false; return {};} },
-	[0x10]: { code: "NOP", exec(){return {};} },
+	[0x01]: { code: "END", exec(executor){executor.on = false;} },
+	[0x10]: { code: "NOP", exec(){} },
 	[0x20]: { code: "JPA", exec(executor, operand){executor.instructionPointer = operand; return { instructionPointerModified: true };} },
 	[0x21]: { code: "JPE", exec(executor, operand){
 		if(executor.flags.compare){
 			executor.instructionPointer = operand;
 			return { instructionPointerModified: true };
-		} else return {};
+		}
 	} },
 	[0x22]: { code: "JPN", exec(executor, operand){
 		if(!executor.flags.compare){
 			executor.instructionPointer = operand;
 			return { instructionPointerModified: true };
-		} else return {};
+		}
 	} },
-	[0x30]: { code: "LDM", exec(executor, operand){executor.registers.ACC = operand; return {};} },
-	[0x31]: { code: "LDD", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand); return {};} },
-	[0x32]: { code: "LDI", exec(executor, operand){executor.registers.ACC = executor.mem.read(executor.mem.read(operand)); return {};} },
-	[0x33]: { code: "LDX", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand + executor.registers.IX); return {};} },
-	[0x34]: { code: "LDR", exec(executor, operand){executor.registers.IX = operand; return {};} },
-	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.ACC); return {};} },
-	[0x41]: { code: "STD", exec(executor, operand){executor.mem.write(executor.mem.read(operand), executor.registers.ACC); return {};} },
+	[0x30]: { code: "LDM", exec(executor, operand){executor.registers.ACC = operand;} },
+	[0x31]: { code: "LDD", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand);} },
+	[0x32]: { code: "LDI", exec(executor, operand){executor.registers.ACC = executor.mem.read(executor.mem.read(operand));} },
+	[0x33]: { code: "LDX", exec(executor, operand){executor.registers.ACC = executor.mem.read(operand + executor.registers.IX);} },
+	[0x34]: { code: "LDR", exec(executor, operand){executor.registers.IX = operand;} },
+	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.ACC);} },
+	[0x41]: { code: "STD", exec(executor, operand){executor.mem.write(executor.mem.read(operand), executor.registers.ACC);} },
 	[0x42]: { code: "MOV", exec(executor, operand){
 		const dst = decodeRegister(operand >> 4);
 		const src = decodeRegister(operand & 0x0F);
-		if(dst && src){
-			executor.registers[dst] = executor.registers[src];
-		} else {
-			executor.on = false;
-			console.warn(`Invalid MOV instruction at 0x${executor.instructionPointer.toString(16)} (${(0x42 * 0x100 + operand).toString(16)}): invalid register`);
-		}
-		return {};
+		if(!dst || !src) return { error:
+			`Invalid MOV instruction at 0x${toHex(executor.instructionPointer, 4)} (${(0x42 * 0x100 + operand).toString(16)}): invalid register`
+		};
+		executor.registers[dst] = executor.registers[src];
 	} },
-	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.ACC += executor.mem.read(operand); return {};} },
-	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.ACC -= executor.mem.read(operand); return {};} },
-	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.ACC *= executor.mem.read(operand); return {};} },
-	[0x53]: { code: "DIV", exec(executor, operand){executor.registers.ACC = Math.trunc(executor.registers.ACC / executor.mem.read(operand)); return {};} },
+	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.ACC += executor.mem.read(operand);} },
+	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.ACC -= executor.mem.read(operand);} },
+	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.ACC *= executor.mem.read(operand);} },
+	[0x53]: { code: "DIV", exec(executor, operand){executor.registers.ACC = Math.trunc(executor.registers.ACC / executor.mem.read(operand));} },
 	[0x54]: { code: "INC", exec(executor, operand){
 		const reg = decodeRegister(operand);
-		if(reg) executor.registers[reg] ++;
-		else {
-			executor.on = false;
-			console.warn(`Invalid INC instruction at 0x${executor.instructionPointer.toString(16)} (${(0x54 * 0x100 + operand).toString(16)}): invalid register`);
-		}
-		return {};
+		if(!reg) return { error:
+			`Invalid INC instruction at 0x${toHex(executor.instructionPointer, 4)} (${(0x54 * 0x100 + operand).toString(16)}): invalid register`
+		};
+		executor.registers[reg] ++;
 	} },
-	[0x55]: { code: "AND", exec(executor, operand){executor.registers.ACC &= executor.mem.read(operand); return {};} },
-	[0x56]: { code: "ORD", exec(executor, operand){executor.registers.ACC |= executor.mem.read(operand); return {};} },
-	[0x57]: { code: "XOR", exec(executor, operand){executor.registers.ACC ^= executor.mem.read(operand); return {};} },
-	[0x60]: { code: "CMP", exec(executor, operand){executor.flags.compare = executor.registers.ACC == executor.mem.read(operand); return {};} },
-	[0x61]: { code: "SLT", exec(executor, operand){executor.flags.compare = executor.registers.ACC < executor.mem.read(operand); return {};} },
-	[0x62]: { code: "SGT", exec(executor, operand){executor.flags.compare = executor.registers.ACC > executor.mem.read(operand); return {};} },
+	[0x55]: { code: "AND", exec(executor, operand){executor.registers.ACC &= executor.mem.read(operand);} },
+	[0x56]: { code: "ORD", exec(executor, operand){executor.registers.ACC |= executor.mem.read(operand);} },
+	[0x57]: { code: "XOR", exec(executor, operand){executor.registers.ACC ^= executor.mem.read(operand);} },
+	[0x60]: { code: "CMP", exec(executor, operand){executor.flags.compare = executor.registers.ACC == executor.mem.read(operand);} },
+	[0x61]: { code: "SLT", exec(executor, operand){executor.flags.compare = executor.registers.ACC < executor.mem.read(operand);} },
+	[0x62]: { code: "SGT", exec(executor, operand){executor.flags.compare = executor.registers.ACC > executor.mem.read(operand);} },
+	//0xFF is executed if the opcode matches no other instruction, or if the opcode is 0xFF
 	[0xFF]: { code: "", exec(executor, operand, opcode){
-		executor.on = false;
-		console.warn(`Invalid instruction at 0x${executor.instructionPointer.toString(16)} (${(opcode * 0x100 + operand).toString(16)})`);
-		return {};
+		return { error:
+			`Invalid instruction at 0x${toHex(executor.instructionPointer, 4)} (${(opcode * 0x100 + operand).toString(16)}): unknown opcode`
+		};
 	}},
 };
 export const instructionMapping = new Map<string, string>(Object.entries(instructions).map(([id, data]) => [data.code, id]));

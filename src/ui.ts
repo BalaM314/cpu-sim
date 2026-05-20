@@ -54,10 +54,15 @@ assemble.onclick = e => {
   memory.value = mem.dump();
 }
 tick.onclick = e => {
-  cpu.tick();
+  const result = cpu.tick();
   memory.value = mem.dump();
-  cpuStatus.innerText = `instruction pointer: ${toHex(cpu.instructionPointer - 1)}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
-  if(!cpu.on) cpuStatus.innerText += " CPU off";
+  if(result != undefined){
+    cpuStatus.innerText = `instruction pointer: ${toHex(cpu.instructionPointer)}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
+    error.innerText = result;
+  } else {
+    cpuStatus.innerText = `instruction pointer: ${toHex(cpu.instructionPointer - 1)}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
+    if(!cpu.on) cpuStatus.innerText += " CPU off";
+  }
   if(!cpu.on) tick.setAttribute("disabled", "true");
   reset.removeAttribute("disabled");
 }
