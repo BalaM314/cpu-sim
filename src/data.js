@@ -47,7 +47,12 @@ export const instructions = {
     [0x50]: { code: "ADD", exec(executor, operand) { executor.registers.ACC += executor.mem.read(operand); } },
     [0x51]: { code: "SUB", exec(executor, operand) { executor.registers.ACC -= executor.mem.read(operand); } },
     [0x52]: { code: "MUL", exec(executor, operand) { executor.registers.ACC *= executor.mem.read(operand); } },
-    [0x53]: { code: "DIV", exec(executor, operand) { executor.registers.ACC = Math.trunc(executor.registers.ACC / executor.mem.read(operand)); } },
+    [0x53]: { code: "DIV", exec(executor, operand) {
+            const result = Math.trunc(executor.registers.ACC / executor.mem.read(operand));
+            if (!Number.isFinite(result))
+                return { error: `Division by zero: value at address ${toHex(operand)} was 0` };
+            executor.registers.ACC = result;
+        } },
     [0x54]: { code: "INC", exec(executor, operand) {
             const reg = decodeRegister(operand);
             if (!reg)
