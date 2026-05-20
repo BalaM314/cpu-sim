@@ -30,6 +30,17 @@ describe("lexLine", () => {
 			{ type: "instruction", text: "ADD" },
 			{ type: "number", variant: "hex", text: "51", value: 81},
 		]);
+		expect(lexLine("INC ACC").lexemes).toEqual([
+			{ type: "label", text: "jumped:" },
+			{ type: "instruction", text: "INC" },
+			{ type: "register", text: "ACC"},
+		]);
+		expect(lexLine("3 MOV IX R4").lexemes).toEqual([
+			{ type: "number", variant: "hex", text: "3", value: 3 },
+			{ type: "instruction", text: "MOV" },
+			{ type: "register", text: "IX"},
+			{ type: "register", text: "R4"},
+		]);
 	});
 });
 
@@ -41,6 +52,8 @@ describe("lexProgram", () => {
 ADD 51
 CMP 52
 JPE 7
+INC ACC
+MOV IX R4
 STO 41
 END
 label: NOP
@@ -55,6 +68,8 @@ END
 			[{ type: "instruction", text: "ADD" }, { type: "number", variant: "hex", text: "51", value: 81}],
 			[{ type: "instruction", text: "CMP" }, { type: "number", variant: "hex", text: "52", value: 82}],
 			[{ type: "instruction", text: "JPE" }, { type: "number", variant: "hex", text: "7", value: 7}],
+			[{ type: "instruction", text: "INC" }, { type: "register", text: "ACC"}],
+			[{ type: "instruction", text: "MOV" }, { type: "register", text: "IX"}, { type: "register", text: "R4"}],
 			[{ type: "instruction", text: "STO" }, { type: "number", variant: "hex", text: "41", value: 65}],
 			[{ type: "instruction", text: "END" }],
 			[{ type: "label", text: "label:" }, { type: "instruction", text: "NOP" }],
