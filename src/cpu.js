@@ -4,9 +4,11 @@ import { instructions } from "./data.js";
 import { toHex } from "./funcs.js";
 export class RAM {
     constructor(size) {
+        this.cleared = true;
         this.storage = new Uint16Array(size);
     }
     load(memoryValues) {
+        this.cleared = false;
         this.clear();
         for (const [index, values] of memoryValues) {
             for (const [i, value] of values.entries()) {
@@ -15,6 +17,7 @@ export class RAM {
         }
     }
     clear() {
+        this.cleared = true;
         for (let i = 0; i < this.storage.length; i++) {
             this.storage[i] = 0;
         }
@@ -43,6 +46,7 @@ export class RAM {
             throw new Error(`Memory address "${index}" is out of bounds`);
     }
     write(index, value) {
+        this.cleared = false;
         if (!Number.isInteger(value))
             throw new Error(`Value ${value} is not an integer`);
         if (value < 0 || value > _a.maxValue)
@@ -57,6 +61,21 @@ _a = RAM;
 RAM.bits = 16;
 RAM.maxValue = 2 ** _a.bits;
 export class ProgramExecutor {
+    reset() {
+        this.flags = {
+            compare: false
+        };
+        this.registers = {
+            ACC: 0,
+            IX: 0,
+            R1: 0,
+            R2: 0,
+            R3: 0,
+            R4: 0,
+        };
+        this.instructionPointer = 0;
+        this.on = true;
+    }
     constructor(mem, instructionPointer = 0) {
         this.mem = mem;
         this.instructionPointer = instructionPointer;

@@ -11,10 +11,12 @@ export class RAM {
 	private storage:Uint16Array;
 	static readonly bits = 16;
 	static readonly maxValue = 2 ** this.bits;
+	cleared = true;
 	constructor(size:number){
 		this.storage = new Uint16Array(size);
 	}
 	load(memoryValues:MemoryLoadInstructions){
+		this.cleared = false;
 		this.clear();
 		for(const [index, values] of memoryValues){
 			for(const [i, value] of values.entries()){
@@ -23,6 +25,7 @@ export class RAM {
 		}
 	}
 	clear(){
+		this.cleared = true;
 		for(let i = 0; i < this.storage.length; i ++){
 			this.storage[i] = 0;
 		}
@@ -47,6 +50,7 @@ export class RAM {
 		else throw new Error(`Memory address "${index}" is out of bounds`);
 	}
 	write(index:number, value:number){
+		this.cleared = false;
 		if(!Number.isInteger(value)) throw new Error(`Value ${value} is not an integer`);
 		if(value < 0 || value > RAM.maxValue) throw new Error(`Value "${value}" is not a valid 16-bit integer`);
 		if(index in this.storage) this.storage[index] = value;
@@ -67,6 +71,21 @@ export class ProgramExecutor {
 		R3: 0,
 		R4: 0,
 	};
+	reset(){
+		this.flags = {
+			compare: false
+		}
+		this.registers = {
+			ACC: 0,
+			IX: 0,
+			R1: 0,
+			R2: 0,
+			R3: 0,
+			R4: 0,
+		};
+		this.instructionPointer = 0;
+		this.on = true;
+	}
 	constructor(public mem:RAM, public instructionPointer = 0){}
 	tick(){
 		if(!this.on) return;

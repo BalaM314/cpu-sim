@@ -24,18 +24,24 @@
 			background-image: url("https://balam314.github.io/starfield.png");
 		}
 		button {
-			background-color: #073707;
-			color: white;
-			border: 3px solid #174717;
 			border-radius: 5px;
 			padding: 4px 10px;
 			font-size: 130%;
+			background-color: #073707;
+			color: white;
+			border: 3px solid #174717;
 		}
-		button:hover {
+		button:disabled {
+			cursor: not-allowed;
+			background-color: #071407;
+			color: gray;
+			border: 3px solid #172717;
+		}
+		button:enabled:hover {
 			background-color: #104010;
 			border: 3px solid #205020;
 		}
-		button:active {
+		button:enabled:active {
 			background-color: #174717;
 			border: 3px solid #275527;
 		}
@@ -114,15 +120,15 @@
 		<h1 id="header">CPU Simulator</h1>
 		<div id="textareas">
 			<textarea name="assembly" id="assembly" rows="20"></textarea>
-			<textarea name="memory" id="memory" rows="20"></textarea>
+			<textarea name="memory" readonly id="memory" rows="20"></textarea>
 		</div>
 		<div class="padded" style="margin-top: 24px;">
 			<div id="cpu-status"></div>
 			<div id="error" style="color: red;"></div>
-			<button id="assemble">assemble</button>
-			<button id="tick">tick</button>
-			<button id="reset">reset</button>
-			<button id="clear">clear memory</button>
+			<button id="assemble">Assemble</button>
+			<button id="tick">Tick</button>
+			<button id="reset" disabled>Reset</button>
+			<button id="clear" disabled>Clear Memory</button>
 		</div>
 		<footer class="padded">
 			Copyright © BalaM314, 2026. MIT License.
@@ -155,33 +161,50 @@ JPA 10 //Jump to address 10
 80 15
 81 15
 82 60`;
-		if(!document.querySelector("#assembly").value){
-			document.querySelector("#assembly").value = sampleProgram;
+		const assembly = document.querySelector("#assembly");
+		const memory = document.querySelector("#memory");
+		const assemble = document.querySelector("#assemble");
+		const tick = document.querySelector("#tick");
+		const reset = document.querySelector("#reset");
+		const clear = document.querySelector("#clear");
+		const error = document.querySelector("#error");
+		const cpuStatus = document.querySelector("#cpu-status");
+		if(!assembly.value){
+			assembly.value = sampleProgram;
 		}
-		document.querySelector("#memory").value = mem.dump();
-		document.querySelector("#assemble").onclick = e => {
+		memory.value = mem.dump();
+		assemble.onclick = e => {
+			clear.removeAttribute("disabled");
 			try {
-				mem.load(assembleProgram(document.querySelector("#assembly").value.split("\n")));
-				document.querySelector("#error").innerText = "";
+				mem.load(assembleProgram(assembly.value.split("\n")));
+				error.innerText = "";
+				cpuStatus.innerText = `Program loaded. Press 'Tick' to run the program one step.`;
 			} catch(err){
-				document.querySelector("#error").innerText = err.message;
+				cpuStatus.innerText = ``;
+				error.innerText = err.message;
 			}
-			document.querySelector("#memory").value = mem.dump();
+			memory.value = mem.dump();
 		}
-		document.querySelector("#tick").onclick = e => {
+		tick.onclick = e => {
 			cpu.tick();
-			document.querySelector("#memory").value = mem.dump();
-			document.querySelector("#cpu-status").innerText = `instruction pointer: ${toHex(cpu.instructionPointer - 1)}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
+			memory.value = mem.dump();
+			cpuStatus.innerText = `instruction pointer: ${toHex(cpu.instructionPointer - 1)}, accumulator contents: ${toHex(cpu.registers.ACC)}`;
+			if(!cpu.on) cpuStatus.innerText += " CPU off";
+			if(!cpu.on) tick.setAttribute("disabled", "true");
+			reset.removeAttribute("disabled");
 		}
-		document.querySelector("#reset").onclick = e => {
-			cpu.instructionPointer = 0;
-			cpu.on = true;
-			document.querySelector("#cpu-status").innerText = `cpu reset`;
+		reset.onclick = e => {
+			cpu.reset();
+			reset.setAttribute("disabled", "true");
+			tick.removeAttribute("disabled");
+			cpuStatus.innerText = `CPU reset. ${mem.cleared ? "Memory not cleared." : ""}`;
 		}
-		document.querySelector("#clear").onclick = e => {
+		clear.onclick = e => {
 			mem.clear();
+			clear.setAttribute("disabled", "true");
 			cpu.instructionPointer = 0;
-			document.querySelector("#memory").value = mem.dump();
+			memory.value = mem.dump();
+			cpuStatus.innerText = `Memory cleared.`;
 		}
 		
 	</script>
