@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. MIT License. */
+/** Copyright © BalaM314, 2026. MIT License. */
 
 import { lexemeTypes } from "../data.js";
 import type { LexedLine, LexedProgram, LexemeMatcher } from "./types.js";

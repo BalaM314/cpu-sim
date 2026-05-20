@@ -1,4 +1,4 @@
-/** Copyright © BalaM314, 2024. MIT License. */
+/** Copyright © BalaM314, 2026. MIT License. */
 
 import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
