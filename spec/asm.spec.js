@@ -23,7 +23,6 @@ describe("lexLine", () => {
             { type: "number", variant: "hex", text: "51", value: 81 },
         ]);
         expect(lexLine("INC ACC").lexemes).toEqual([
-            { type: "label", text: "jumped:" },
             { type: "instruction", text: "INC" },
             { type: "register", text: "ACC" },
         ]);

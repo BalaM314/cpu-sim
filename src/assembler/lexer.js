@@ -54,10 +54,10 @@ export function processLexemeMatcherString(str) {
 export function lexLine(line) {
     return {
         lexemes: splitLineOnSpace(line).map(chunk => {
-            if (chunk.match(/^[a-z]{3}$/i))
-                return { type: "instruction", text: chunk };
             if (chunk.match(/^(ACC|IX|R1|R2|R3|R4)$/i))
                 return { type: "register", text: chunk };
+            if (chunk.match(/^[a-z]{3}$/i))
+                return { type: "instruction", text: chunk }; //TODO this is really silly, you can't have three digit hex numbers or they will always be interpreted as instructions, even in lowercase
             if (chunk.match(/^[\dA-F]+$/i))
                 return { type: "number", variant: "hex", text: chunk, value: parseInt(chunk, 16) };
             if (chunk.match(/^\#\d+$/i))
