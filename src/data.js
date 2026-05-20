@@ -41,7 +41,7 @@ export const instructions = {
     [0x40]: { code: "STO", exec(executor, operand) { executor.mem.write(operand, executor.registers.ACC); return {}; } },
     [0x41]: { code: "STD", exec(executor, operand) { executor.mem.write(executor.mem.read(operand), executor.registers.ACC); return {}; } },
     [0x42]: { code: "MOV", exec(executor, operand) {
-            const dst = decodeRegister(operand & 0xF0);
+            const dst = decodeRegister(operand >> 4);
             const src = decodeRegister(operand & 0x0F);
             if (dst && src) {
                 executor.registers[dst] = executor.registers[src];
