@@ -3,6 +3,7 @@
 import type { ProgramExecutor } from "./cpu.js";
 import type { ProcessedLine, MemoryValue } from "./assembler/types.js";
 import { processLexemeMatcherString } from "./assembler/lexer.js";
+import { crash } from "./funcs.js";
 
 export const lexemeTypes = ["number", "instruction", "label", "register"] as const;
 
@@ -49,7 +50,17 @@ export const instructions: {
 	[0x34]: { code: "LDR", exec(executor, operand){executor.registers.IX = operand; return {};} },
 	[0x40]: { code: "STO", exec(executor, operand){executor.mem.write(operand, executor.registers.ACC); return {};} },
 	[0x41]: { code: "STD", exec(executor, operand){executor.mem.write(executor.mem.read(operand), executor.registers.ACC); return {};} },
-	// [0x42]: { code: "MOV", exec(executor, operand){executor.registers[operand] = executor.registers.ACC; return {};} },
+	[0x42]: { code: "MOV", exec(executor, operand){
+		const dst = decodeRegister(operand & 0xF0);
+		const src = decodeRegister(operand & 0x0F);
+		if(dst && src){
+			executor.registers[dst] = executor.registers[src];
+		} else {
+			executor.on = false;
+			console.warn(`Invalid MOV instruction at 0x${executor.instructionPointer.toString(16)} (${(0x42 * 0x100 + operand).toString(16)}): invalid register`);
+		}
+		return {};
+	} },
 	[0x50]: { code: "ADD", exec(executor, operand){executor.registers.ACC += executor.mem.read(operand); return {};} },
 	[0x51]: { code: "SUB", exec(executor, operand){executor.registers.ACC -= executor.mem.read(operand); return {};} },
 	[0x52]: { code: "MUL", exec(executor, operand){executor.registers.ACC *= executor.mem.read(operand); return {};} },
@@ -75,7 +86,7 @@ export const instructions: {
 		return {};
 	}},
 };
-export const instructionMapping = new Map(Object.entries(instructions).map(([id, data]) => [id, data.code].reverse() as [code:string, id:string]));
+export const instructionMapping = new Map<string, string>(Object.entries(instructions).map(([id, data]) => [data.code, id]));
 
 export const statements = (statements => Object.fromEntries(
 	Object.entries(statements)
@@ -110,6 +121,20 @@ export const statements = (statements => Object.fromEntries(
 			return {
 				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined,
 				value: (+id << 8) + reg,
+			}
+		}
+	},
+	instruction3: { //for the MOV instruction: two registers
+		lexemes: ["number|label?", "instruction", "register", "register"],
+		getOutput(line:ProcessedLine):MemoryValue {
+			const instruction = line.lexemes[1]!.text;
+			const id = instructionMapping.get(instruction.toUpperCase());
+			if(id == undefined) throw new Error(`Invalid instruction "${instruction}"\nat "${line.rawText}"`);
+			const reg1 = encodeRegister(line.lexemes[2]!.text) ?? crash(`Register ${line.lexemes[2]!.text} was invalid`);
+			const reg2 = encodeRegister(line.lexemes[3]!.text) ?? crash(`Register ${line.lexemes[3]!.text} was invalid`);
+			return {
+				address: line.lexemes[0]?.type == "number" ? line.lexemes[0].value : undefined,
+				value: (+id << 8) + (reg1 << 4) + (reg2),
 			}
 		}
 	},
