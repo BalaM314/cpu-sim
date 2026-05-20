@@ -1,26 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<!-- Copyright © BalaM314, 2024. MIT License. -->
+	<!-- Copyright © BalaM314, 2026. MIT License. -->
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CPU Simulator</title>
 	<script src="src/cpu.js" type="module"></script>
 	<script src="src/assembler/assembler.js" type="module"></script>
+	<style>
+		:root * {
+			font-family: sans-serif;
+			box-sizing: border-box;
+		}
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+			position: absolute;
+			background-color: #000;
+		}
+		body {
+			background-image: url("https://balam314.github.io/starfield.png");
+		}
+		button {
+			background-color: #073707;
+			color: white;
+			border: 3px solid #174717;
+			border-radius: 5px;
+			padding: 4px 10px;
+			font-size: 130%;
+		}
+		button:hover {
+			background-color: #104010;
+			border: 3px solid #205020;
+		}
+		button:active {
+			background-color: #174717;
+			border: 3px solid #275527;
+		}
+		#container {
+			padding: 15px 1px;
+			background-color: #0026;
+			color: whitesmoke;
+			font-size: 20px;
+			height: 100%;
+		}
+		.padded {
+			padding: 0 15px;
+		}
+		@media screen and (max-width: 600px) {
+			#container {
+				margin: 0px;
+				padding: 15px 1.5vw;
+				border-width: 2vw;
+				background-color: #0046;
+				min-height: calc(100vh - 2 * (15px + 2vw));
+			}
+		}
+		#header {
+			text-align: center;
+			margin-top: 0;
+		}
+		footer {
+			position: sticky;
+			top: 100%;
+		}
+		#textareas {
+			display: flex;
+			width: 100%;
+		}
+		#textareas textarea {
+			font-family: monospace;
+			background-color: #000;
+			color: white;
+			border: 0;
+			margin-bottom: 4px;
+		}
+		#textareas textarea:focus-visible {
+			outline: 0;
+			border-bottom: 4px solid lightblue;
+			margin-bottom: 0;
+		}
+		#textareas textarea:nth-child(1) {
+			border-right: 4px solid white;
+			width: calc(50% - 2px);
+			padding-left: 8px;
+		}
+		#textareas textarea:nth-child(2) {
+			width: calc(50% + 2px);
+			padding-right: 8px;
+		}
+		a {
+			color: #00C400;
+		}
+		a:hover {
+			color: #00EC00;
+		}
+		a:active {
+			color: #0F0;
+		}
+	</style>
 </head>
 <body>
-	<h1>CPU Simulator</h1>
-	<textarea name="assembly" id="assembly" cols="100" rows="20"></textarea>
-	<textarea name="memory" id="memory" cols="100" rows="20"></textarea>
-	<br>
-	<button id="assemble">assemble</button>
-	<button id="tick">tick</button>
-	<button id="reset">reset</button>
-	<button id="clear">clear memory</button>
-	<div id="cpu-status"></div>
-	<div id="error" style="color: red;"></div>
-	<div id="footer">Copyright © BalaM314, 2024. MIT License. <a href="https://github.com/BalaM314/cpu-sim/">Open source.</a></div>
+	<div id="container">
+		<h1 id="header">CPU Simulator</h1>
+		<div id="textareas">
+			<textarea name="assembly" id="assembly" rows="20"></textarea>
+			<textarea name="memory" id="memory" rows="20"></textarea>
+		</div>
+		<div class="padded" style="margin-top: 24px;">
+			<button id="assemble">assemble</button>
+			<button id="tick">tick</button>
+			<button id="reset">reset</button>
+			<button id="clear">clear memory</button>
+			<div id="cpu-status"></div>
+			<div id="error" style="color: red;"></div>
+		</div>
+		<footer class="padded">
+			Copyright © BalaM314, 2026. MIT License.
+			<a href="https://github.com/BalaM314/cpu-sim/">Open source.</a>
+		</footer>
+	</div>
 	<script type="module">
 		import * as cpu_js from "./src/cpu.js";
 		import * as asm_js from "./src/assembler/assembler.js";
